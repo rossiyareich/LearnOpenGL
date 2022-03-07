@@ -14,6 +14,7 @@
 using glErrorLog = char[GL_ERROR_LENGTH];
 
 #define decltypearraymember(array) std::remove_all_extents<decltype(*(array))>::type
+#define carraysize(array) (sizeof((array)) / sizeof(decltypearraymember((array))))
 
 using namespace std::string_literals;
 
@@ -155,7 +156,7 @@ void main()
 
     // Gen buffers
     GLuint buffers[2]{};
-    glGenBuffers((sizeof(buffers) / sizeof(decltypearraymember(buffers))), buffers);
+    glGenBuffers(carraysize(buffers), buffers);
     const GLuint vboBuffer = buffers[0];
     const GLuint eboBuffer = buffers[1];
 
