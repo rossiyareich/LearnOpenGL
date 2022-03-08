@@ -52,6 +52,12 @@ namespace rendering
         glUniform1f(glGetUniformLocation(ProgramID, name), value);
     }
 
+    void ShaderProgram::SetUFMatrix4Float(const char* name, const GLfloat* const value,
+                                          GLboolean transpose) const
+    {
+        glUniformMatrix4fv(glGetUniformLocation(ProgramID, name), 1, transpose, value);
+    }
+
 
     ShaderProgram::~ShaderProgram()
     {

@@ -1,11 +1,17 @@
+#include <functional>
 #include <iostream>
 #include <ostream>
 
 #include <glew/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "helpers/Constants.h"
 #include "helpers/Helpers.h"
+
+#include "manipulation/Transformation.h"
+
 #include "rendering/Buffer.h"
 #include "rendering/Shader.h"
 #include "rendering/ShaderProgram.h"
@@ -14,10 +20,9 @@
 
 #include "window/Window.h"
 
-using namespace std::string_literals;
-
 using namespace rendering;
 using namespace window;
+using namespace manipulation;
 
 void ProcessInputs(const Window& window)
 {
@@ -25,12 +30,13 @@ void ProcessInputs(const Window& window)
         window.SetWindowShouldClose(true);
 }
 
-inline void ClearToHTMLColor(const uint32_t htmlColor, const float alpha)
+inline std::tuple<float, float, float> HTMLToRGBFloat(const uint32_t htmlColor)
 {
-    glClearColor(static_cast<float>((htmlColor & 0xFF0000) >> 16) / 255.0f,
-                 static_cast<float>(((htmlColor & 0xFF00) >> 8)) / 255.0f,
-                 static_cast<float>((htmlColor & 0xFF)) / 255.0f,
-                 alpha);
+    return {
+        static_cast<float>((htmlColor & 0xFF0000) >> 16) / 255.0f,
+        static_cast<float>(((htmlColor & 0xFF00) >> 8)) / 255.0f,
+        static_cast<float>((htmlColor & 0xFF)) / 255.0f
+    };
 }
 
 int main()
@@ -60,20 +66,20 @@ int main()
 #pragma endregion
 
     // x, y, z /* */ r, g, b, a /* */ x, y
-    constexpr float vertices[] = {
+    constexpr float vertices[]{
         0.5f, 0.5f, 0.0f, /* */ 0.0f, 0.0f, 1.0f, 1.0f, /* */ 1.0f, 1.0f, // top right
         0.5f, -0.5f, 0.0f, /* */ 0.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 0.0f, // bottom right
         -0.5f, -0.5f, 0.0f, /* */ 1.0f, 1.0f, 0.0f, 1.0f, /* */ 0.0f, 0.0f, // bottom left
         -0.5f, 0.5f, 0.0f, /* */ 1.0f, 0.0f, 0.0f, 1.0f /* */, 0.0f, 1.0f // top left 
     };
 
-    constexpr uint8_t indices[] = {
+    constexpr uint8_t indices[]{
         // note that we start from 0!
         0, 1, 3, // first triangle
         1, 2, 3 // second triangle
     };
 
-    constexpr float texCoords[] = {
+    constexpr float texCoords[]{
         0.0f, 0.0f,
         1.0f, 0.0f,
         0.0f, 1.0f,
@@ -89,14 +95,13 @@ int main()
     const Buffer& vboBuffer{GL_ARRAY_BUFFER};
     const Buffer& eboBuffer{GL_ELEMENT_ARRAY_BUFFER};
 
-    // Gen & bind vertex array {
+    // Gen & setup vertex array {
     const VertexArray& vaoArray{};
     vaoArray.Bind();
 
-    // Initialize pipeline
-    vboBuffer.Bind(); // vbo
+    vboBuffer.Bind();
     vboBuffer.PushArray(vertices, GL_STATIC_DRAW);
-    eboBuffer.Bind(); // ebo
+    eboBuffer.Bind();
     eboBuffer.PushArray(indices, GL_STATIC_DRAW);
 
     /* Set vbo vertex attributes */
@@ -111,19 +116,19 @@ int main()
     // } Unbind vertex array
 
     // Setup textures
-    Texture boxTexture{"res/container.jpg", GL_TEXTURE_2D, true};
-    Texture awesomeFaceTexture{"res/awesomeface.png", GL_TEXTURE_2D, true};
+    const Texture& boxTexture{"res/container.jpg", GL_TEXTURE_2D, true};
+    const Texture& awesomeFaceTexture{"res/awesomeface.png", GL_TEXTURE_2D, true};
     shaderProgram.Use();
     shaderProgram.SetUFInt("texture1", 0);
     shaderProgram.SetUFInt("texture2", 1);
 
-    /* Loop until the user closes the window */
     while (!window.WindowShouldClose())
     {
         ProcessInputs(window);
 
-        ClearToHTMLColor(0x0f3b19, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT); // Clear old buffer
+        auto [r, g, b]{HTMLToRGBFloat(0x0f3b19)};
+        glClearColor(r, g, b, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         // Start drawing
         shaderProgram.Use();
@@ -133,6 +138,12 @@ int main()
         boxTexture.Bind();
         Texture::Activate(GL_TEXTURE1);
         awesomeFaceTexture.Bind();
+
+        const auto& transformationMat = Transformation::TransformationMatrix(
+            glm::vec3{0.5f, -0.5f, 0.0f},
+            {glm::vec3{0.0f, 1.0f, 0.0f}, static_cast<float>(glfwGetTime()) * 10.0f},
+            glm::vec3{0.5f, 0.5f, 0.5f});
+        shaderProgram.SetUFMatrix4Float("transformationMatrix", value_ptr(transformationMat));
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
 

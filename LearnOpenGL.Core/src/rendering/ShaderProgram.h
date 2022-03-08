@@ -17,5 +17,6 @@ namespace rendering
         void SetUFBool(const char* name, bool value) const;
         void SetUFInt(const char* name, int value) const;
         void SetUFFloat(const char* name, float value) const;
+        void SetUFMatrix4Float(const char* name, const GLfloat* value, GLboolean transpose = GL_FALSE) const;
     };
 }

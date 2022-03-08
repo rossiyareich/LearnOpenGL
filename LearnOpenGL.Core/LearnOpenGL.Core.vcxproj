@@ -98,7 +98,7 @@
       <AdditionalDependencies>glew\glew32s.lib;opengl32.lib;GLFW\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y "$(ProjectDir)res\" "$(OutDir)res\"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y /d "$(ProjectDir)res\" "$(OutDir)res\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,7 +121,7 @@
       <AdditionalDependencies>glew\glew32s.lib;opengl32.lib;GLFW\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y "$(ProjectDir)res\" "$(OutDir)res\"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y /d "$(ProjectDir)res\" "$(OutDir)res\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -140,7 +140,7 @@
       <AdditionalDependencies>glew\glew32s.lib;opengl32.lib;GLFW\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y "$(ProjectDir)res\" "$(OutDir)res\"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y /d "$(ProjectDir)res\" "$(OutDir)res\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,11 +163,13 @@
       <AdditionalDependencies>glew\glew32s.lib;opengl32.lib;GLFW\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y "$(ProjectDir)res\" "$(OutDir)res\"</Command>
+      <Command>xcopy /y /d "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y /d "$(ProjectDir)res\" "$(OutDir)res\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\manipulation\Rotation.cpp" />
+    <ClCompile Include="src\manipulation\Transformation.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
     <ClCompile Include="src\rendering\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\Texture.cpp" />
@@ -178,6 +180,8 @@
   <ItemGroup>
     <ClInclude Include="src\helpers\Helpers.h" />
     <ClInclude Include="src\helpers\Constants.h" />
+    <ClInclude Include="src\manipulation\Rotation.h" />
+    <ClInclude Include="src\manipulation\Transformation.h" />
     <ClInclude Include="src\rendering\Shader.h" />
     <ClInclude Include="src\rendering\ShaderProgram.h" />
     <ClInclude Include="src\rendering\Texture.h" />
