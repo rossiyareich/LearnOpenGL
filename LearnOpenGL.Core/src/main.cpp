@@ -67,9 +67,9 @@ int main()
 
     // x, y, z /* */ r, g, b, a /* */ x, y
     constexpr float vertices[]{
-        0.5f, 0.5f, 0.0f, /* */ 0.0f, 0.0f, 1.0f, 1.0f, /* */ 1.0f, 1.0f, // top right
-        0.5f, -0.5f, 0.0f, /* */ 0.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, /* */ 1.0f, 1.0f, 0.0f, 1.0f, /* */ 0.0f, 0.0f, // bottom left
+        0.5f, 0.5f, 0.0f, /* */ 0.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 1.0f, // top right
+        0.5f, -0.5f, 0.0f, /* */ 1.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, /* */ 0.0f, 0.0f, 1.0f, 1.0f, /* */ 0.0f, 0.0f, // bottom left
         -0.5f, 0.5f, 0.0f, /* */ 1.0f, 0.0f, 0.0f, 1.0f /* */, 0.0f, 1.0f // top left 
     };
 
@@ -140,12 +140,12 @@ int main()
         awesomeFaceTexture.Bind();
 
         const auto& transformationMat = Transformation::TransformationMatrix(
-            glm::vec3{0.5f, -0.5f, 0.0f},
-            {glm::vec3{0.0f, 1.0f, 0.0f}, static_cast<float>(glfwGetTime()) * 10.0f},
-            glm::vec3{0.5f, 0.5f, 0.5f});
+            {0.5f, -0.5f, 0.0f},
+            {{0.0f, 0.0f, 1.0f}, static_cast<float>(glfwGetTime()) * -3.0f},
+            {0.5f, 0.5f, 0.5f});
         shaderProgram.SetUFMatrix4Float("transformationMatrix", value_ptr(transformationMat));
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr);
+        glDrawElements(GL_TRIANGLES, carraysize(indices), GL_UNSIGNED_BYTE, nullptr);
 
         boxTexture.Unbind();
         awesomeFaceTexture.Unbind();

@@ -8,7 +8,7 @@ namespace manipulation
     {
     }
 
-    Rotation::Rotation(const glm::vec3 axis, const float radians) : Axis{axis}, Radians{radians}
+    Rotation::Rotation(const glm::vec3& axis, const float radians) : Axis{axis}, Radians{radians}
     {
     }
 
