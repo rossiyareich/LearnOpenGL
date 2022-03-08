@@ -64,15 +64,15 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="src\ext\fragmentShader.frag" />
-    <CopyFileToFolders Include="src\ext\vertexShader.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\container.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="res\awesomeface.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\ext\fragmentShader.frag" />
+    <Text Include="src\ext\vertexShader.vert" />
   </ItemGroup>
 </Project>
