@@ -10,7 +10,7 @@ namespace rendering
     public:
         uint32_t TextureID;
         GLenum TextureTarget;
-        Texture(const char* const file, const GLenum target, const bool flipped = false);
+        Texture(const char* file, GLenum target, bool flipped = false);
         ~Texture();
         void Bind() const;
         void Unbind() const;

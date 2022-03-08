@@ -129,11 +129,6 @@ int main()
         shaderProgram.Use();
         vaoArray.Bind();
 
-        //const double timeValue = glfwGetTime();
-        //const double greenValue = sin(timeValue) / 2.0 + 0.5;
-        //const GLint vertexColorLocation = assertRet(glGetUniformLocation(shaderProgram, "ourColor"));
-        //glUniform4f(vertexColorLocation, 0.0f, static_cast<GLfloat>(greenValue), 0.0f, 1.0f);
-
         Texture::Activate(GL_TEXTURE0);
         boxTexture.Bind();
         Texture::Activate(GL_TEXTURE1);
