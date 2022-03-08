@@ -1,2 +1,2 @@
 # LearnOpenGL
-A project for learning OpenGL
+A project for learning OpenGL, ref https://learnopengl.com/
