@@ -16,5 +16,10 @@ T __assertRet(const T ptr, const uint32_t line, const char* const file, const ch
     }
 
     return ptr;
-#define assertRet(ptr) __assertRet((ptr), __LINE__, __FILE__, __FUNCTION__)
 }
+
+#define assertRet(ptr) __assertRet((ptr), __LINE__, __FILE__, __FUNCTION__)
+
+
+#define OnKeyPressed(window, key) if(glfwGetKey((window).Handle, (key)) == GLFW_PRESS)
+#define _OnKeyPressed(window, key) else OnKeyPressed(window, key)

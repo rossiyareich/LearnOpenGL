@@ -36,10 +36,16 @@
     <ClCompile Include="src\rendering\VertexArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\manipulation\Transformation.cpp">
+    <ClCompile Include="src\manipulation\MatrixHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\manipulation\Rotation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\manipulation\RenderMatrix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\camera\Camera3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,10 +74,16 @@
     <ClInclude Include="src\rendering\VertexArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\manipulation\Transformation.h">
+    <ClInclude Include="src\manipulation\MatrixHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\manipulation\Rotation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\manipulation\RenderMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\camera\Camera3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

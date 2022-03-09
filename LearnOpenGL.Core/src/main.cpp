@@ -7,10 +7,13 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "camera/Camera3D.h"
+
 #include "helpers/Constants.h"
 #include "helpers/Helpers.h"
 
-#include "manipulation/Transformation.h"
+#include "manipulation/MatrixHelper.h"
+#include "manipulation/RenderMatrix.h"
 
 #include "rendering/Buffer.h"
 #include "rendering/Shader.h"
@@ -23,12 +26,10 @@
 using namespace rendering;
 using namespace window;
 using namespace manipulation;
+using namespace camera;
 
-void ProcessInputs(const Window& window)
-{
-    if (glfwGetKey(window.Handle, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        window.SetWindowShouldClose(true);
-}
+static float w = WINDOW_W;
+static float h = WINDOW_H;
 
 inline std::tuple<float, float, float> HTMLToRGBFloat(const uint32_t htmlColor)
 {
@@ -47,6 +48,8 @@ int main()
         [](GLFWwindow* window, int w, int h)
         {
             glViewport(0, 0, w, h);
+            ::w = static_cast<float>(w);
+            ::h = static_cast<float>(h);
         }
     };
     OnResized(window.Handle, WINDOW_W, WINDOW_H);
@@ -63,20 +66,67 @@ int main()
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
 
+    glEnable(GL_DEPTH_TEST);
+
 #pragma endregion
 
-    // x, y, z /* */ r, g, b, a /* */ x, y
-    constexpr float vertices[]{
-        0.5f, 0.5f, 0.0f, /* */ 0.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 1.0f, // top right
-        0.5f, -0.5f, 0.0f, /* */ 1.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, /* */ 0.0f, 0.0f, 1.0f, 1.0f, /* */ 0.0f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f, /* */ 1.0f, 0.0f, 0.0f, 1.0f /* */, 0.0f, 1.0f // top left 
-    };
+    //// x, y, z /* */ r, g, b, a /* */ x, y
+    //constexpr float vertices[]{
+    //    0.5f, 0.5f, 0.0f, /* */ 0.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 1.0f, // top right
+    //    0.5f, -0.5f, 0.0f, /* */ 1.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 0.0f, // bottom right
+    //    -0.5f, -0.5f, 0.0f, /* */ 0.0f, 0.0f, 1.0f, 1.0f, /* */ 0.0f, 0.0f, // bottom left
+    //    -0.5f, 0.5f, 0.0f, /* */ 1.0f, 0.0f, 0.0f, 1.0f /* */, 0.0f, 1.0f // top left 
+    //};
 
-    constexpr uint8_t indices[]{
-        // note that we start from 0!
-        0, 1, 3, // first triangle
-        1, 2, 3 // second triangle
+    //constexpr uint8_t indices[]{
+    //    // note that we start from 0!
+    //    0, 1, 3, // first triangle
+    //    1, 2, 3 // second triangle
+    //};
+
+    // x, y, z /* */ r, g, b, a /* */ x, y
+    constexpr float vertices[] = {
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
     constexpr float texCoords[]{
@@ -93,7 +143,7 @@ int main()
 
     // Create buffers
     const Buffer& vboBuffer{GL_ARRAY_BUFFER};
-    const Buffer& eboBuffer{GL_ELEMENT_ARRAY_BUFFER};
+    //const Buffer& eboBuffer{GL_ELEMENT_ARRAY_BUFFER};
 
     // Gen & setup vertex array {
     const VertexArray& vaoArray{};
@@ -101,8 +151,8 @@ int main()
 
     vboBuffer.Bind();
     vboBuffer.PushArray(vertices, GL_STATIC_DRAW);
-    eboBuffer.Bind();
-    eboBuffer.PushArray(indices, GL_STATIC_DRAW);
+    //eboBuffer.Bind();
+    //eboBuffer.PushArray(indices, GL_STATIC_DRAW);
 
     /* Set vbo vertex attributes */
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(0));
@@ -122,13 +172,50 @@ int main()
     shaderProgram.SetUFInt("texture1", 0);
     shaderProgram.SetUFInt("texture2", 1);
 
+    glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f, 2.0f, -2.5f),
+        glm::vec3(1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -1.5f)
+    };
+
+    Camera3D camera{{0.0f, 0.0f, 3.0f}};
+    constexpr float cameraSpeed{5.0f};
+    constexpr float rollSpeed{1f};
+    float deltaTime{};
+    float lastFrame{};
+#define dt(var) (deltaTime * (var))
     while (!window.WindowShouldClose())
     {
-        ProcessInputs(window);
+        const auto currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        OnKeyPressed(window, GLFW_KEY_ESCAPE)
+            window.SetWindowShouldClose(true);
+        _OnKeyPressed(window, GLFW_KEY_W)
+            camera.MovePositionEuler(dt(cameraSpeed), 0, 0);
+        _OnKeyPressed(window, GLFW_KEY_A)
+            camera.MovePositionEuler(0, -dt(cameraSpeed), 0);
+        _OnKeyPressed(window, GLFW_KEY_S)
+            camera.MovePositionEuler(-dt(cameraSpeed), 0, 0);
+        _OnKeyPressed(window, GLFW_KEY_D)
+            camera.MovePositionEuler(0, dt(cameraSpeed), 0);
+        _OnKeyPressed(window, GLFW_KEY_E)
+            camera.RotateEulerAngles(0, 0,dt(rollSpeed));
+        _OnKeyPressed(window, GLFW_KEY_Q)
+            camera.RotateEulerAngles(0, 0, -dt(rollSpeed));
 
         auto [r, g, b]{HTMLToRGBFloat(0x0f3b19)};
         glClearColor(r, g, b, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Start drawing
         shaderProgram.Use();
@@ -139,13 +226,30 @@ int main()
         Texture::Activate(GL_TEXTURE1);
         awesomeFaceTexture.Bind();
 
-        const auto& transformationMat = Transformation::TransformationMatrix(
-            {0.5f, -0.5f, 0.0f},
-            {{0.0f, 0.0f, 1.0f}, static_cast<float>(glfwGetTime()) * -3.0f},
-            {0.5f, 0.5f, 0.5f});
-        shaderProgram.SetUFMatrix4Float("transformationMatrix", value_ptr(transformationMat));
+        //glDrawElements(GL_TRIANGLES, carraysize(indices), GL_UNSIGNED_BYTE, nullptr);
 
-        glDrawElements(GL_TRIANGLES, carraysize(indices), GL_UNSIGNED_BYTE, nullptr);
+        for (auto& cubePosition : cubePositions)
+        {
+            const RenderMatrix& matrixPipeline{
+
+                MatrixHelper::TransformationMatrix(
+                    cubePosition,
+                    {{0.5f, 1.0f, 0.0f}, static_cast<float>(glfwGetTime())}),
+
+                //MatrixHelper::TransformationMatrix(
+                //    {0.0f, 0.0f, -3.0f}),
+
+                camera.GetView(),
+
+                MatrixHelper::PerspectiveMatrix(
+                    Rotation::ToRadians(45.0f),
+                    w / h,
+                    0.1f,
+                    100.0f)
+            };
+            matrixPipeline.SetMatrixPipeline(shaderProgram);
+            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 9);
+        }
 
         boxTexture.Unbind();
         awesomeFaceTexture.Unbind();
@@ -153,7 +257,6 @@ int main()
         // Finish drawing
         shaderProgram.Unuse();
         vaoArray.Unbind();
-
 
         glfwSwapBuffers(window.Handle); /* Swap front and back buffers */
         glfwPollEvents(); /* Poll for and process events */
