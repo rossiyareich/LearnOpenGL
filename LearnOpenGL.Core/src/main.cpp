@@ -40,6 +40,47 @@ inline std::tuple<float, float, float> HTMLToRGBFloat(const uint32_t htmlColor)
     };
 }
 
+static float pitch{}, yaw{};
+static double lastX{}, lastY{};
+static bool firstMouse{true};
+
+void OnCursorPositionChanged(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reverse because y is reversed
+    lastX = xpos;
+    lastY = ypos;
+
+    xoffset *= MOUSE_SENSITIVITY;
+    yoffset *= MOUSE_SENSITIVITY;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 90.0f)
+        pitch = 90.0f;
+    if (pitch < -90.0f)
+        pitch = -90.0f;
+}
+
+static float fov{45.0f};
+
+void OnScrollChanged(GLFWwindow* window, double xoffset, double yoffset)
+{
+    fov -= static_cast<float>(yoffset); // reverse because y is reversed
+    if (fov > 90.0f)
+        fov = 90.0f;
+    if (fov < 1.0f)
+        fov = 1.0f;
+}
+
 int main()
 {
     Window window{"LearnOpenGL", WINDOW_W, WINDOW_H};
@@ -54,6 +95,20 @@ int main()
     };
     OnResized(window.Handle, WINDOW_W, WINDOW_H);
     glfwSetFramebufferSizeCallback(window.Handle, OnResized);
+
+    GLFWwindowfocusfun OnFocused{
+        [](GLFWwindow* window, int focused)
+        {
+            if (focused)
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+    };
+    OnFocused(window.Handle, 1);
+    glfwSetWindowFocusCallback(window.Handle, OnFocused);
+
+    glfwSetCursorPosCallback(window.Handle, OnCursorPositionChanged);
+
+    glfwSetScrollCallback(window.Handle, OnScrollChanged);
 
     std::cout << glGetString(GL_VERSION) << std::endl;
 
@@ -186,8 +241,8 @@ int main()
     };
 
     Camera3D camera{{0.0f, 0.0f, 3.0f}};
-    constexpr float cameraSpeed{5.0f};
-    constexpr float rollSpeed{1f};
+    constexpr float moveSpeed{5.0f};
+    constexpr float rollSpeed{1.0f};
     float deltaTime{};
     float lastFrame{};
 #define dt(var) (deltaTime * (var))
@@ -198,19 +253,28 @@ int main()
         lastFrame = currentFrame;
 
         OnKeyPressed(window, GLFW_KEY_ESCAPE)
-            window.SetWindowShouldClose(true);
+            window.SetInputMode(GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        _OnKeyPressed(window, GLFW_KEY_4)
+        {
+            fov = 45.0f;
+            pitch = 0.0f;
+            yaw = 0.0f;
+            camera = Camera3D{{0.0f, 0.0f, 3.0f}};
+        }
         _OnKeyPressed(window, GLFW_KEY_W)
-            camera.MovePositionEuler(dt(cameraSpeed), 0, 0);
+            camera.MovePosition(dt(moveSpeed), 0, 0);
         _OnKeyPressed(window, GLFW_KEY_A)
-            camera.MovePositionEuler(0, -dt(cameraSpeed), 0);
+            camera.MovePosition(0, -dt(moveSpeed), 0);
         _OnKeyPressed(window, GLFW_KEY_S)
-            camera.MovePositionEuler(-dt(cameraSpeed), 0, 0);
+            camera.MovePosition(-dt(moveSpeed), 0, 0);
         _OnKeyPressed(window, GLFW_KEY_D)
-            camera.MovePositionEuler(0, dt(cameraSpeed), 0);
+            camera.MovePosition(0, dt(moveSpeed), 0);
         _OnKeyPressed(window, GLFW_KEY_E)
             camera.RotateEulerAngles(0, 0,dt(rollSpeed));
         _OnKeyPressed(window, GLFW_KEY_Q)
             camera.RotateEulerAngles(0, 0, -dt(rollSpeed));
+
+        camera.SetEulerAnglesRaw(Rotation::ToRadians(pitch), Rotation::ToRadians(yaw - 90.0f), camera.GetRollRad());
 
         auto [r, g, b]{HTMLToRGBFloat(0x0f3b19)};
         glClearColor(r, g, b, 1.0f);
@@ -242,7 +306,7 @@ int main()
                 camera.GetView(),
 
                 MatrixHelper::PerspectiveMatrix(
-                    Rotation::ToRadians(45.0f),
+                    Rotation::ToRadians(fov),
                     w / h,
                     0.1f,
                     100.0f)

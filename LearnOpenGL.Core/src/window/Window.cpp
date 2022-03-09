@@ -43,4 +43,9 @@ namespace window
     {
         glfwSetWindowShouldClose(Handle, value);
     }
+
+    void Window::SetInputMode(int mode, int value) const
+    {
+        glfwSetInputMode(Handle, mode, value);
+    }
 }

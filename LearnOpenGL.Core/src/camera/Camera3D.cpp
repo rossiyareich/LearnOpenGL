@@ -55,6 +55,15 @@ namespace camera
         ChangeEulerAngles();
     }
 
+    void Camera3D::SetEulerAnglesRaw(float pitchRad, float yawRad, float rollRad)
+    {
+        this->pitchRad = pitchRad;
+        this->yawRad = yawRad;
+        this->rollRad = rollRad;
+
+        ChangeEulerAngles();
+    }
+
     void Camera3D::RotateEulerAngles(float pitchRad, float yawRad, float rollRad)
     {
         this->pitchRad += pitchRad;

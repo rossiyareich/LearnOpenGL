@@ -13,5 +13,6 @@ namespace window
 
         int WindowShouldClose() const;
         void SetWindowShouldClose(int value) const;
+        void SetInputMode(int mode, int value) const;
     };
 }

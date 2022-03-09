@@ -16,6 +16,7 @@ namespace camera
         glm::vec3 Position;
 
         void SetEulerAngles(float pitchRad, float yawRad, float rollRad);
+        void SetEulerAnglesRaw(float pitchRad, float yawRad, float rollRad);
         void RotateEulerAngles(float pitchRad, float yawRad, float rollRad);
         void MovePosition(float x, float y, float z);
         void MovePositionEuler(float x, float y, float z);
