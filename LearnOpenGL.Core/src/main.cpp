@@ -31,15 +31,6 @@ using namespace camera;
 static float w = WINDOW_W;
 static float h = WINDOW_H;
 
-inline std::tuple<float, float, float> HTMLToRGBFloat(const uint32_t htmlColor)
-{
-    return {
-        static_cast<float>((htmlColor & 0xFF0000) >> 16) / 255.0f,
-        static_cast<float>(((htmlColor & 0xFF00) >> 8)) / 255.0f,
-        static_cast<float>((htmlColor & 0xFF)) / 255.0f
-    };
-}
-
 static float pitch{}, yaw{};
 static double lastX{}, lastY{};
 static bool firstMouse{true};
@@ -53,16 +44,16 @@ void OnCursorPositionChanged(GLFWwindow* window, double xpos, double ypos)
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reverse because y is reversed
+    double xoffset = xpos - lastX;
+    double yoffset = lastY - ypos; // reverse because y is reversed
     lastX = xpos;
     lastY = ypos;
 
     xoffset *= MOUSE_SENSITIVITY;
     yoffset *= MOUSE_SENSITIVITY;
 
-    yaw += xoffset;
-    pitch += yoffset;
+    yaw += static_cast<float>(xoffset);
+    pitch += static_cast<float>(yoffset);
 
     if (pitch > 90.0f)
         pitch = 90.0f;
@@ -75,8 +66,8 @@ static float fov{45.0f};
 void OnScrollChanged(GLFWwindow* window, double xoffset, double yoffset)
 {
     fov -= static_cast<float>(yoffset); // reverse because y is reversed
-    if (fov > 90.0f)
-        fov = 90.0f;
+    if (fov > 45.0f)
+        fov = 45.0f;
     if (fov < 1.0f)
         fov = 1.0f;
 }
@@ -228,16 +219,8 @@ int main()
     shaderProgram.SetUFInt("texture2", 1);
 
     glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(2.0f, 5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f, 3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f, 2.0f, -2.5f),
-        glm::vec3(1.5f, 0.2f, -1.5f),
-        glm::vec3(-1.3f, 1.0f, -1.5f)
+        glm::vec3(0.0f, 0.0f, -3.0f),
+        glm::vec3(2.0f, 2.0f, -5.0f)
     };
 
     Camera3D camera{{0.0f, 0.0f, 3.0f}};
@@ -262,23 +245,26 @@ int main()
             camera = Camera3D{{0.0f, 0.0f, 3.0f}};
         }
         _OnKeyPressed(window, GLFW_KEY_W)
-            camera.MovePosition(dt(moveSpeed), 0, 0);
+            camera.MovePositionEuler(dt(moveSpeed), 0, 0);
         _OnKeyPressed(window, GLFW_KEY_A)
-            camera.MovePosition(0, -dt(moveSpeed), 0);
+            camera.MovePositionEuler(0, -dt(moveSpeed), 0);
         _OnKeyPressed(window, GLFW_KEY_S)
-            camera.MovePosition(-dt(moveSpeed), 0, 0);
+            camera.MovePositionEuler(-dt(moveSpeed), 0, 0);
         _OnKeyPressed(window, GLFW_KEY_D)
-            camera.MovePosition(0, dt(moveSpeed), 0);
+            camera.MovePositionEuler(0, dt(moveSpeed), 0);
         _OnKeyPressed(window, GLFW_KEY_E)
             camera.RotateEulerAngles(0, 0,dt(rollSpeed));
         _OnKeyPressed(window, GLFW_KEY_Q)
             camera.RotateEulerAngles(0, 0, -dt(rollSpeed));
+        _OnKeyPressed(window, GLFW_KEY_R)
+            camera.MovePositionEuler(0, 0, dt(moveSpeed));
+        _OnKeyPressed(window, GLFW_KEY_F)
+            camera.MovePositionEuler(0, 0, -dt(moveSpeed));
 
         camera.SetEulerAnglesRaw(Rotation::ToRadians(pitch), Rotation::ToRadians(yaw - 90.0f), camera.GetRollRad());
 
         auto [r, g, b]{HTMLToRGBFloat(0x0f3b19)};
         glClearColor(r, g, b, 1.0f);
-        //glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Start drawing
@@ -298,10 +284,7 @@ int main()
 
                 MatrixHelper::TransformationMatrix(
                     cubePosition,
-                    {{0.5f, 1.0f, 0.0f}, static_cast<float>(glfwGetTime())}),
-
-                //MatrixHelper::TransformationMatrix(
-                //    {0.0f, 0.0f, -3.0f}),
+                    {{0.5f, 1.0f, 0.0f}, 0}),
 
                 camera.GetView(),
 

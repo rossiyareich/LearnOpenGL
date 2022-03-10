@@ -28,3 +28,12 @@ T map(T x, T in_min, T in_max, T out_min, T out_max)
 {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
+
+inline std::tuple<float, float, float> HTMLToRGBFloat(const uint32_t htmlColor)
+{
+    return {
+        static_cast<float>((htmlColor & 0xFF0000) >> 16) / 255.0f,
+        static_cast<float>(((htmlColor & 0xFF00) >> 8)) / 255.0f,
+        static_cast<float>((htmlColor & 0xFF)) / 255.0f
+    };
+}
