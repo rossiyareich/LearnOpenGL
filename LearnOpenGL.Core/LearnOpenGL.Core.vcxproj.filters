@@ -57,6 +57,9 @@
     <ClCompile Include="src\lighting\PhongMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\lighting\PhongTexturedMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\Shader.h">
@@ -110,6 +113,9 @@
     <ClInclude Include="src\lighting\PhongMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lighting\PhongTexturedMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\awesomeface.png">
@@ -126,5 +132,13 @@
   <ItemGroup>
     <CopyFileToFolders Include="src\ext\lightSourceFragmentShader.frag" />
     <CopyFileToFolders Include="src\ext\lightSourceVertexShader.vert" />
+    <CopyFileToFolders Include="src\ext\texturedFragmentShader.frag" />
+    <CopyFileToFolders Include="src\ext\texturedVertexShader.vert" />
+    <CopyFileToFolders Include="res\container2.png">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="res\container2_specular.png">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

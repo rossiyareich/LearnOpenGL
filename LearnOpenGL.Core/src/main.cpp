@@ -20,9 +20,12 @@
 #include "window/Window.h"
 #include "lighting/PhongLightSource.h"
 #include "lighting/PhongMaterial.h"
+#include "lighting/PhongTexturedMaterial.h"
 
 #include "logging/ConsoleLogger.h"
 #include "logging/LogLevel.h"
+
+#include "rendering/Texture.h"
 
 using namespace rendering;
 using namespace window;
@@ -122,49 +125,49 @@ int main()
 
 #pragma endregion
 
-    // x, y, z, ..., normalX, normalY, normalZ
     constexpr float vertices[]{
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+        // positions          // normals           // texture coords
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
 
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
     };
 
     // Create buffers
@@ -186,9 +189,9 @@ int main()
     vaoArray.Bind();
     vboBuffer.Bind();
     /* Set vbo vertex attributes */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, reinterpret_cast<void*>(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, reinterpret_cast<void*>(sizeof(float) * 3));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 3));
     glEnableVertexAttribArray(1); // Use vertex attributes @ location = 1
     vaoArray.Unbind();
     // } Unbind vertex array
@@ -211,12 +214,32 @@ int main()
     lightSourceArray.Bind();
     vboBuffer.Bind();
     /* Set vbo vertex attributes */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, reinterpret_cast<void*>(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
     lightSourceArray.Unbind();
     glm::vec3 lightPosition{0.0f, 2.0f, 0.0f};
     glm::vec3 lightColor{1.0f};
-    PhongLightSource lightSource{camera, lightPosition, lightColor};
+    PhongLightSource lightSource{camera, lightPosition, lightColor, 0.2f, 0.3f, 2.0f};
+
+    const ShaderProgram& texturedProgram{
+        {"src/ext/texturedVertexShader.vert", GL_VERTEX_SHADER},
+        {"src/ext/texturedFragmentShader.frag", GL_FRAGMENT_SHADER}
+    };
+    const VertexArray& texturedArray{};
+    texturedArray.Bind();
+    vboBuffer.Bind();
+    /* Set vbo vertex attributes */
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 3));
+    glEnableVertexAttribArray(1); // Use vertex attributes @ location = 1
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 6));
+    glEnableVertexAttribArray(2); // Use vertex attributes @ location = 2
+    texturedArray.Unbind();
+    glm::vec3 texturedPosition{5.0f, 3.0f, 0.0f};
+    PhongTexturedMaterial texturedMaterial{};
+    Texture diffuseMap{"res/container2.png", GL_TEXTURE_2D, true};
+    Texture specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
 
     float deltaTime{}, lastFrame{};
     int fpsSampleCount{1};
@@ -267,13 +290,39 @@ int main()
         }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Start drawing box
-        shaderProgram.Use();
-        vaoArray.Bind();
-        for (auto& cubePosition : cubePositions)
         {
-            const RenderMatrix& cubeMatrixPipeline{
-                MatrixHelper::TransformationMatrix(cubePosition, {}, {5.0f, 1.0f, 5.0f}),
+            // Start drawing box
+            shaderProgram.Use();
+            vaoArray.Bind();
+            for (auto& cubePosition : cubePositions)
+            {
+                const RenderMatrix& cubeMatrixPipeline{
+                    MatrixHelper::TransformationMatrix(cubePosition, {}, {5.0f, 1.0f, 5.0f}),
+                    camera.GetView(),
+                    MatrixHelper::PerspectiveMatrix(
+                        Rotation::ToRadians(fov),
+                        w / h,
+                        0.1f,
+                        100.0f)
+                };
+                cubeMatrixPipeline.SetMatrixPipeline(shaderProgram);
+
+                // Do lighting
+                cubeMaterial.SendMaterial(shaderProgram);
+                lightSource.Emit(shaderProgram);
+
+                glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+            }
+            // Finish drawing box
+            shaderProgram.Unuse();
+            vaoArray.Unbind();
+        }
+
+        {
+            texturedProgram.Use();
+            texturedArray.Bind();
+            const RenderMatrix& texturedMatrixPipeline{
+                MatrixHelper::TransformationMatrix(texturedPosition),
                 camera.GetView(),
                 MatrixHelper::PerspectiveMatrix(
                     Rotation::ToRadians(fov),
@@ -281,46 +330,55 @@ int main()
                     0.1f,
                     100.0f)
             };
-            cubeMatrixPipeline.SetMatrixPipeline(shaderProgram);
+            texturedMatrixPipeline.SetMatrixPipeline(texturedProgram);
+
+            Texture::Activate(GL_TEXTURE0);
+            diffuseMap.Bind();
+            Texture::Activate(GL_TEXTURE1);
+            specularMap.Bind();
 
             // Do lighting
-            cubeMaterial.SendMaterial(shaderProgram);
-            lightSource.Emit(shaderProgram);
+            texturedMaterial.SendMaterial(texturedProgram);
+            lightSource.Emit(texturedProgram);
 
-            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 6);
+            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+
+            diffuseMap.Unbind();
+            specularMap.Unbind();
+
+            texturedProgram.Unuse();
+            texturedArray.Unbind();
         }
-        // Finish drawing box
-        shaderProgram.Unuse();
-        vaoArray.Unbind();
 
-        lightPosition.x = cos(static_cast<float>(glfwGetTime())) * 3.0f;
-        lightPosition.z = sin(static_cast<float>(glfwGetTime())) * 3.0f;
+        {
+            // Start drawing light box
+            lightSourceProgram.Use();
+            lightSourceArray.Bind();
+            const RenderMatrix& lightMatrixPipeline{
+                MatrixHelper::TransformationMatrix(
+                    lightPosition,
+                    Rotation({0.0f, 1.0f, 0.0f},
+                             static_cast<float>(glfwGetTime()) * 10.0f),
+                    glm::vec3{0.3f}),
+                camera.GetView(),
+                MatrixHelper::PerspectiveMatrix(
+                    Rotation::ToRadians(fov),
+                    w / h,
+                    0.1f,
+                    100.0f)
+            };
+            lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
+            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+            // Finish drawing light box
+            lightSourceProgram.Unuse();
+            lightSourceArray.Unbind();
+        }
 
-        HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f), 1,
+        lightPosition.x = cos(static_cast<float>(glfwGetTime())) * 1.5f;
+        lightPosition.z = sin(static_cast<float>(glfwGetTime())) * 1.5f;
+        HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
+                 1,
                  1);
-
-        // Start drawing light box
-        lightSourceProgram.Use();
-        lightSourceArray.Bind();
-        const RenderMatrix& lightMatrixPipeline{
-            MatrixHelper::TransformationMatrix(
-                lightPosition,
-                Rotation({0.0f, 1.0f, 0.0f},
-                         static_cast<float>(glfwGetTime()) * 10.0f),
-                glm::vec3{0.5f}),
-            camera.GetView(),
-            MatrixHelper::PerspectiveMatrix(
-                Rotation::ToRadians(fov),
-                w / h,
-                0.1f,
-                100.0f)
-        };
-        lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
-        glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 6);
-        // Finish drawing light box
-        lightSourceProgram.Unuse();
-        lightSourceArray.Unbind();
-
 
         glfwSwapBuffers(window.Handle); /* Swap front and back buffers */
         glfwPollEvents(); /* Poll for and process events */
