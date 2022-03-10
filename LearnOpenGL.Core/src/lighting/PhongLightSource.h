@@ -14,21 +14,21 @@ namespace lighting
     class PhongLightSource
     {
     public:
-        PhongLightSource(const rendering::ShaderProgram& program,
-                         const rendering::VertexArray& array,
-                         glm::vec3* worldPosition);
-        void DrawLightSource(
-            const manipulation::RenderMatrix& pipeline,
-            std::function<void()> drawCall) const;
-        void SetupScene(const rendering::ShaderProgram* scene, const std::tuple<float, float, float>& lightColor);
-        void FinishScene();
-        void EmitAmbient(float intensity) const;
-        void EmitDiffuse() const;
-        void EmitSpecular(const camera::Camera3D& camera, float intensity) const;
+        glm::vec3& LightPosition;
+        glm::vec3& LightColor;
+        float Ambient;
+        float Diffuse;
+        float Specular;
+
+        PhongLightSource(const camera::Camera3D& camera,
+                         glm::vec3& lightPosition,
+                         glm::vec3& lightColor,
+                         float ambient = 0.5f,
+                         float diffuse = 1.0f,
+                         float specular = 0.5f);
+
+        void Emit(const rendering::ShaderProgram& program) const;
     private:
-        const rendering::ShaderProgram& program;
-        const rendering::VertexArray& array;
-        glm::vec3* worldPosition;
-        const rendering::ShaderProgram* scene;
+        const camera::Camera3D& camera;
     };
 }

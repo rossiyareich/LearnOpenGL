@@ -43,10 +43,10 @@ namespace logging
             std::cout << dye::light_blue(timeString + "-[DEBUG]"s) << dye::green("=> ");
             break;
         case LogLevel::Warning:
-            std::cout << dye::yellow(timeString + "-[DEBUG]"s) << dye::green("=> ");
+            std::cout << dye::yellow(timeString + "-[WARNING]"s) << dye::green("=> ");
             break;
         case LogLevel::Error:
-            std::cout << dye::light_red(timeString + "-[DEBUG]"s) << dye::green("=> ");
+            std::cout << dye::light_red(timeString + "-[ERROR]"s) << dye::green("=> ");
             break;
         default:
             throw std::exception("Not supported");

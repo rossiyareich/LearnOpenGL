@@ -4,53 +4,28 @@
 
 namespace lighting
 {
-    PhongLightSource::PhongLightSource(const rendering::ShaderProgram& program,
-                                       const rendering::VertexArray& array,
-                                       glm::vec3* const worldPosition) :
-        program{program},
-        array{array},
-        worldPosition{worldPosition},
-        scene{nullptr}
+    PhongLightSource::PhongLightSource(const camera::Camera3D& camera,
+                                       glm::vec3& lightPosition,
+                                       glm::vec3& lightColor,
+                                       float ambient,
+                                       float diffuse,
+                                       float specular) :
+        LightPosition(lightPosition),
+        LightColor(lightColor),
+        Ambient(ambient),
+        Diffuse(diffuse),
+        Specular(specular),
+        camera(camera)
     {
     }
 
-    void PhongLightSource::DrawLightSource(const manipulation::RenderMatrix& pipeline,
-                                           std::function<void()> drawCall) const
+    void PhongLightSource::Emit(const rendering::ShaderProgram& program) const
     {
-        program.Use();
-        array.Bind();
-        pipeline.SetMatrixPipeline(program);
-        drawCall();
-        program.Unuse();
-        array.Unbind();
-    }
-
-    void PhongLightSource::SetupScene(const rendering::ShaderProgram* const scene,
-                                      const std::tuple<float, float, float>& lightColor)
-    {
-        this->scene = scene;
-        auto& [r, g, b] = lightColor;
-        scene->SetUFVector3("lightColor", r, g, b);
-    }
-
-    void PhongLightSource::FinishScene()
-    {
-        scene = nullptr;
-    }
-
-    void PhongLightSource::EmitAmbient(float intensity) const
-    {
-        scene->SetUFFloat("ambient", intensity);
-    }
-
-    void PhongLightSource::EmitDiffuse() const
-    {
-        scene->SetUFVector3("lightPosition", worldPosition->x, worldPosition->y, worldPosition->z);
-    }
-
-    void PhongLightSource::EmitSpecular(const camera::Camera3D& camera, float intensity) const
-    {
-        scene->SetUFVector3("cameraPosition", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-        scene->SetUFFloat("specular", intensity);
+        program.SetUFVector3("cameraPosition", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+        program.SetUFVector3("light.lightPosition", LightPosition.x, LightPosition.y, LightPosition.z);
+        program.SetUFVector3("light.lightColor", LightColor.x, LightColor.y, LightColor.z);
+        program.SetUFFloat("light.ambient", Ambient);
+        program.SetUFFloat("light.diffuse", Diffuse);
+        program.SetUFFloat("light.specular", Specular);
     }
 }

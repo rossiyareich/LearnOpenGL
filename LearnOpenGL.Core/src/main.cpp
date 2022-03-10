@@ -19,6 +19,8 @@
 #include "rendering/VertexArray.h"
 #include "window/Window.h"
 #include "lighting/PhongLightSource.h"
+#include "lighting/PhongMaterial.h"
+
 #include "logging/ConsoleLogger.h"
 #include "logging/LogLevel.h"
 
@@ -171,11 +173,14 @@ int main()
     vboBuffer.PushArray(vertices, GL_STATIC_DRAW);
     vboBuffer.Unbind();
 
+    Camera3D camera{{0.0f, 0.0f, 10.0f}};
+    constexpr float moveSpeed{5.0f};
+    constexpr float rollSpeed{1.0f};
+
     const ShaderProgram& shaderProgram{
         {"src/ext/vertexShader.vert", GL_VERTEX_SHADER},
         {"src/ext/fragmentShader.frag", GL_FRAGMENT_SHADER}
     };
-
     // Gen & setup vertex array {
     const VertexArray& vaoArray{};
     vaoArray.Bind();
@@ -191,6 +196,12 @@ int main()
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 4.0f, 0.0f)
     };
+    glm::vec3 cubeColor{};
+    {
+        auto [r, g, b]{HTMLToRGBFloat(0xffffff)};
+        cubeColor = {r, g, b};
+    }
+    PhongMaterial cubeMaterial{cubeColor};
 
     const ShaderProgram& lightSourceProgram{
         {"src/ext/lightSourceVertexShader.vert", GL_VERTEX_SHADER},
@@ -204,15 +215,9 @@ int main()
     glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
     lightSourceArray.Unbind();
     glm::vec3 lightPosition{0.0f, 2.0f, 0.0f};
-    PhongLightSource lightSource{
-        lightSourceProgram,
-        lightSourceArray,
-        &lightPosition
-    };
+    glm::vec3 lightColor{1.0f};
+    PhongLightSource lightSource{camera, lightPosition, lightColor};
 
-    Camera3D camera{{0.0f, 0.0f, 3.0f}};
-    constexpr float moveSpeed{5.0f};
-    constexpr float rollSpeed{1.0f};
     float deltaTime{}, lastFrame{};
     int fpsSampleCount{1};
 #define dt(var) (deltaTime * (var))
@@ -236,7 +241,7 @@ int main()
             fov = 45.0f;
             pitch = 0.0f;
             yaw = 0.0f;
-            camera = Camera3D{{0.0f, 0.0f, 3.0f}};
+            camera = Camera3D{{0.0f, 0.0f, 10.0f}};
         }
         _OnKeyPressed(window, GLFW_KEY_W)
             camera.MovePositionEuler(dt(moveSpeed), 0, 0);
@@ -247,30 +252,27 @@ int main()
         _OnKeyPressed(window, GLFW_KEY_D)
             camera.MovePositionEuler(0, dt(moveSpeed), 0);
         _OnKeyPressed(window, GLFW_KEY_E)
-            camera.RotateEulerAngles(0, 0,dt(rollSpeed));
-        _OnKeyPressed(window, GLFW_KEY_Q)
             camera.RotateEulerAngles(0, 0, -dt(rollSpeed));
+        _OnKeyPressed(window, GLFW_KEY_Q)
+            camera.RotateEulerAngles(0, 0, dt(rollSpeed));
         _OnKeyPressed(window, GLFW_KEY_R)
             camera.MovePositionEuler(0, 0, dt(moveSpeed));
         _OnKeyPressed(window, GLFW_KEY_F)
             camera.MovePositionEuler(0, 0, -dt(moveSpeed));
         camera.SetEulerAnglesRaw(Rotation::ToRadians(pitch), Rotation::ToRadians(yaw - 90.0f), camera.GetRollRad());
 
-        auto [r, g, b]{HTMLToRGBFloat(0x000b24)};
-        glClearColor(r, g, b, 1.0f);
+        {
+            auto [r, g, b]{HTMLToRGBFloat(0x000b24)};
+            glClearColor(r, g, b, 1.0f);
+        }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Start drawing
+        // Start drawing box
         shaderProgram.Use();
         vaoArray.Bind();
-
         for (auto& cubePosition : cubePositions)
         {
-            auto [r, g, b]{HTMLToRGBFloat(0xa6550f)};
-            shaderProgram.SetUFVector3("objectColor", r, g, b);
-            shaderProgram.SetUFUint32("shininess", 32);
-
-            const RenderMatrix& matrixPipeline{
+            const RenderMatrix& cubeMatrixPipeline{
                 MatrixHelper::TransformationMatrix(cubePosition, {}, {5.0f, 1.0f, 5.0f}),
                 camera.GetView(),
                 MatrixHelper::PerspectiveMatrix(
@@ -279,42 +281,46 @@ int main()
                     0.1f,
                     100.0f)
             };
-            matrixPipeline.SetMatrixPipeline(shaderProgram);
+            cubeMatrixPipeline.SetMatrixPipeline(shaderProgram);
+
+            // Do lighting
+            cubeMaterial.SendMaterial(shaderProgram);
+            lightSource.Emit(shaderProgram);
+
             glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 6);
         }
+        // Finish drawing box
+        shaderProgram.Unuse();
+        vaoArray.Unbind();
 
         lightPosition.x = cos(static_cast<float>(glfwGetTime())) * 3.0f;
         lightPosition.z = sin(static_cast<float>(glfwGetTime())) * 3.0f;
 
-        // Do lighting
-        lightSource.SetupScene(&shaderProgram, {1.0f, 1.0f, 1.0f});
-        lightSource.EmitAmbient(0.05f);
-        lightSource.EmitDiffuse();
-        lightSource.EmitSpecular(camera, 0.5f);
-        lightSource.FinishScene();
+        HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f), 1,
+                 1);
 
-        // Finish drawing
-        shaderProgram.Unuse();
-        vaoArray.Unbind();
+        // Start drawing light box
+        lightSourceProgram.Use();
+        lightSourceArray.Bind();
+        const RenderMatrix& lightMatrixPipeline{
+            MatrixHelper::TransformationMatrix(
+                lightPosition,
+                Rotation({0.0f, 1.0f, 0.0f},
+                         static_cast<float>(glfwGetTime()) * 10.0f),
+                glm::vec3{0.5f}),
+            camera.GetView(),
+            MatrixHelper::PerspectiveMatrix(
+                Rotation::ToRadians(fov),
+                w / h,
+                0.1f,
+                100.0f)
+        };
+        lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
+        glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 6);
+        // Finish drawing light box
+        lightSourceProgram.Unuse();
+        lightSourceArray.Unbind();
 
-        // Draw light source
-        lightSource.DrawLightSource(
-            {
-                MatrixHelper::TransformationMatrix(lightPosition,
-                                                   Rotation({0.0f, 1.0f, 0.0f},
-                                                            static_cast<float>(glfwGetTime()) * 10.0f),
-                                                   glm::vec3{0.5f}),
-                camera.GetView(),
-                MatrixHelper::PerspectiveMatrix(
-                    Rotation::ToRadians(fov),
-                    w / h,
-                    0.1f,
-                    100.0f)
-            },
-            []()
-            {
-                glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 6);
-            });
 
         glfwSwapBuffers(window.Handle); /* Swap front and back buffers */
         glfwPollEvents(); /* Poll for and process events */
