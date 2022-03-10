@@ -3,6 +3,7 @@
 #define WINDOW_W 800
 #define WINDOW_H 600
 #define MOUSE_SENSITIVITY 0.1f
+#define FPS_SAMPLE_RATE 1000
 
 #define GL_ERROR_LENGTH 512
 #include <glm/vec3.hpp>

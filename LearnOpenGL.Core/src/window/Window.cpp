@@ -27,6 +27,7 @@ namespace window
         /* Make the window's context current */
         glfwMakeContextCurrent(Handle);
         assert(glewInit() == GLEW_OK);
+        glfwSwapInterval(0);
     }
 
     Window::~Window()

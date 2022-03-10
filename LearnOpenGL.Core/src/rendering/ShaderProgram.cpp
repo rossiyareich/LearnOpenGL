@@ -7,7 +7,11 @@
 
 namespace rendering
 {
-    ShaderProgram::ShaderProgram(Shader& vertex, Shader& fragment) : ProgramID{glCreateProgram()}
+    ShaderProgram::ShaderProgram() : ProgramID{}
+    {
+    }
+
+    ShaderProgram::ShaderProgram(Shader&& vertex, Shader&& fragment) : ProgramID{glCreateProgram()}
     {
         glAttachShader(ProgramID, vertex.ShaderID);
         glAttachShader(ProgramID, fragment.ShaderID);
@@ -22,7 +26,11 @@ namespace rendering
             std::cout << infoLog << std::endl;
             assert(false);
         }
+    }
 
+    ShaderProgram::ShaderProgram(Shader& vertex, Shader& fragment) : ShaderProgram(
+        std::move(vertex), std::move(fragment))
+    {
         vertex.~Shader();
         fragment.~Shader();
     }
@@ -58,6 +66,15 @@ namespace rendering
         glUniformMatrix4fv(glGetUniformLocation(ProgramID, name), 1, transpose, value);
     }
 
+    void ShaderProgram::SetUFVector3(const char* name, const float x, const float y, const float z) const
+    {
+        glUniform3f(glGetUniformLocation(ProgramID, name), x, y, z);
+    }
+
+    void ShaderProgram::SetUFUint32(const char* name, const uint32_t value) const
+    {
+        glUniform1ui(glGetUniformLocation(ProgramID, name), value);
+    }
 
     ShaderProgram::~ShaderProgram()
     {

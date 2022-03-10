@@ -167,7 +167,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\lighting\PhongLightSource.cpp" />
     <ClCompile Include="src\camera\Camera3D.cpp" />
+    <ClCompile Include="src\logging\ConsoleLogger.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\manipulation\RenderMatrix.cpp" />
     <ClCompile Include="src\manipulation\Rotation.cpp" />
@@ -180,9 +182,13 @@
     <ClCompile Include="src\window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\logging\ConsoleLogger.h" />
+    <ClInclude Include="src\logging\ILogger.h" />
+    <ClInclude Include="src\lighting\PhongLightSource.h" />
     <ClInclude Include="src\camera\Camera3D.h" />
     <ClInclude Include="src\helpers\Helpers.h" />
     <ClInclude Include="src\helpers\Constants.h" />
+    <ClInclude Include="src\logging\LogLevel.h" />
     <ClInclude Include="src\manipulation\RenderMatrix.h" />
     <ClInclude Include="src\manipulation\Rotation.h" />
     <ClInclude Include="src\manipulation\MatrixHelper.h" />
@@ -226,6 +232,24 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="src\ext\lightSourceFragmentShader.frag">
+      <DeploymentContent>true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="src\ext\lightSourceVertexShader.vert">
+      <DeploymentContent>true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

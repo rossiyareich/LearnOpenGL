@@ -48,6 +48,12 @@
     <ClCompile Include="src\camera\Camera3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\lighting\PhongLightSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\logging\ConsoleLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\Shader.h">
@@ -86,6 +92,18 @@
     <ClInclude Include="src\camera\Camera3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lighting\PhongLightSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\logging\ILogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\logging\LogLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\logging\ConsoleLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\awesomeface.png">
@@ -98,5 +116,9 @@
   <ItemGroup>
     <Text Include="src\ext\fragmentShader.frag" />
     <Text Include="src\ext\vertexShader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="src\ext\lightSourceFragmentShader.frag" />
+    <CopyFileToFolders Include="src\ext\lightSourceVertexShader.vert" />
   </ItemGroup>
 </Project>
