@@ -4,6 +4,10 @@
 #define LINEAR 0.09
 #define QUADRATIC 0.032
 
+#define NR_GLOBALDIR_LIGHTS 2
+#define NR_POINT_LIGHTS 4
+#define NR_SPOT_LIGHTS 2
+
 out vec4 FragColor;
 
 in vec3 ourNormal;
@@ -40,45 +44,13 @@ struct Light {
     float diffuse;
     float specular;
 };
-uniform Light light;
 
-void main()
+uniform Light globalDirLights[NR_GLOBALDIR_LIGHTS];
+uniform Light pointLights[NR_POINT_LIGHTS];
+uniform Light spotLights[NR_SPOT_LIGHTS];
+
+vec3 GetPhong(Light light, vec3 _lightDirection, float _attenuation, float _nonAmbientCoeff)
 {
-    vec3 _lightDirection;
-    float _attenuation;
-    float _nonAmbientCoeff = 1.0;
-
-    switch (light.lightType)
-    {
-        case 0:
-        {
-            _lightDirection = normalize(-light.lightData.lightDirection);
-
-            _attenuation = 1.0;
-            break;
-        }
-        case 1:
-        {
-            _lightDirection = normalize(light.lightData.lightPosition - ourFragmentPosition);
-
-            float _distance = length(light.lightData.lightPosition - ourFragmentPosition);
-            _attenuation = 1.0 / (CONSTANT + LINEAR * _distance + QUADRATIC * (_distance * _distance));
-            break;
-        }
-        case 2:
-        {
-            _lightDirection = normalize(light.lightData.lightPosition - ourFragmentPosition);
-
-            float _distance = length(light.lightData.lightPosition - ourFragmentPosition);
-            _attenuation = 1.0 / (CONSTANT + LINEAR * _distance + QUADRATIC * (_distance * _distance));
-
-            float _theta = dot(_lightDirection, normalize(-light.lightData.lightDirection));
-            float _epsilon = light.lightData.lightInnerCutoff - light.lightData.lightOuterCutoff;
-            _nonAmbientCoeff = clamp((_theta - light.lightData.lightOuterCutoff) / _epsilon, 0.0, 1.0);
-            break;
-        }
-    }
-
     // Ambient
     vec3 _ambient = light.ambient * texture(diffuse, ourTexCoords).rgb * light.lightColor;
 
@@ -105,5 +77,65 @@ void main()
     _diffuse *= _attenuation * _nonAmbientCoeff;
     _specular *= _attenuation * _nonAmbientCoeff;
 
-    FragColor = vec4(_ambient + _diffuse + _specular + _emission, 1.0);
+    return (_ambient + _diffuse + _specular + _emission);
+}
+
+vec3 CalcGlobalDirLight(Light light)
+{
+    vec3 _lightDirection;
+    float _attenuation;
+    float _nonAmbientCoeff = 1.0;
+
+    _lightDirection = normalize(-light.lightData.lightDirection);
+    _attenuation = 1.0;
+
+    return GetPhong(light, _lightDirection, _attenuation, _nonAmbientCoeff);
+}
+
+vec3 CalcPointLight(Light light)
+{
+    vec3 _lightDirection;
+    float _attenuation;
+    float _nonAmbientCoeff = 1.0;
+
+    _lightDirection = normalize(light.lightData.lightPosition - ourFragmentPosition);
+
+    float _distance = length(light.lightData.lightPosition - ourFragmentPosition);
+    _attenuation = 1.0 / (CONSTANT + LINEAR * _distance + QUADRATIC * (_distance * _distance));
+
+    return GetPhong(light, _lightDirection, _attenuation, _nonAmbientCoeff);
+}
+
+vec3 CalcSpotlight(Light light)
+{
+    vec3 _lightDirection;
+    float _attenuation;
+    float _nonAmbientCoeff = 1.0;
+
+    _lightDirection = normalize(light.lightData.lightPosition - ourFragmentPosition);
+
+    float _distance = length(light.lightData.lightPosition - ourFragmentPosition);
+    _attenuation = 1.0 / (CONSTANT + LINEAR * _distance + QUADRATIC * (_distance * _distance));
+
+    float _theta = dot(_lightDirection, normalize(-light.lightData.lightDirection));
+    float _epsilon = light.lightData.lightInnerCutoff - light.lightData.lightOuterCutoff;
+    _nonAmbientCoeff = clamp((_theta - light.lightData.lightOuterCutoff) / _epsilon, 0.0, 1.0);
+
+    return GetPhong(light, _lightDirection, _attenuation, _nonAmbientCoeff);
+}
+
+void main()
+{
+    vec3 result;
+
+    for(int i = 0; i < NR_GLOBALDIR_LIGHTS; i++)
+        result += CalcGlobalDirLight(globalDirLights[i]);
+
+    for(int i = 0; i < NR_POINT_LIGHTS; i++)
+        result += CalcPointLight(pointLights[i]);
+
+    for(int i = 0; i < NR_SPOT_LIGHTS; i++)
+        result += CalcSpotlight(spotLights[i]);
+
+    FragColor = vec4(result, 1.0);
 }

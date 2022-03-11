@@ -24,16 +24,24 @@ namespace lighting
         float Specular;
         PhongLightType LightType;
 
-        PhongLightSource(const camera::Camera3D& camera,
+        PhongLightSource(camera::Camera3D& camera,
                          PhongLightData& lightData,
                          glm::vec3& lightColor,
                          PhongLightType lightType = PhongLightType::Point,
-                         float ambient = 0.5f,
+                         float ambient = 0.0f,
                          float diffuse = 1.0f,
                          float specular = 0.5f);
 
-        void Emit(const rendering::ShaderProgram& program) const;
+        PhongLightSource(camera::Camera3D& camera,
+                         const PhongLightData& lightData,
+                         const glm::vec3& lightColor,
+                         PhongLightType lightType = PhongLightType::Point,
+                         float ambient = 0.0f,
+                         float diffuse = 1.0f,
+                         float specular = 0.5f);
+
+        void Emit(const rendering::ShaderProgram& program, int index) const;
     private:
-        const camera::Camera3D& camera;
+        camera::Camera3D& camera;
     };
 }

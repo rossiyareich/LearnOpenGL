@@ -1,3 +1,4 @@
+#include <array>
 #include <functional>
 #include <iostream>
 #include <ostream>
@@ -79,6 +80,16 @@ void OnScrollChanged(GLFWwindow* window, double xoffset, double yoffset)
         fov = 45.0f;
     if (fov < 1.0f)
         fov = 1.0f;
+}
+
+template <size_t TSize>
+void EmitAllLights(const ShaderProgram& program, const std::array<std::pair<PhongLightSource, int>, TSize>& lights)
+{
+    for (const auto& light : lights)
+    {
+        auto [source, index] = light;
+        source.Emit(program, index);
+    }
 }
 
 int main()
@@ -220,14 +231,41 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
     lightSourceArray.Unbind();
-    PhongLightData lightData = {
-        {0.0, 0.0f, -1.0f},
-        {0.0f, 2.0f, 0.0f},
-        Rotation::ToRadians(10.0f),
-        Rotation::ToRadians(20.0f)
-    };
+
     glm::vec3 lightColor{1.0f};
-    PhongLightSource lightSource{camera, lightData, lightColor, PhongLightType::Spotlight, 0.5f, 1.0f, 2.0f};
+    std::array lightSources =
+    {
+        std::pair{
+            PhongLightSource{
+                camera, {glm::vec3{1.0}}, glm::vec3{1.0f}, PhongLightType::GlobalDirectional, 0.1f, 0.0f, 0.0f
+            },
+            0
+        },
+        std::pair{PhongLightSource{camera, {{}, {0.7f, -5.0f, 2.0f}}, lightColor}, 0},
+        std::pair{PhongLightSource{camera, {{}, {2.3f, -3.3f, -4.0f}}, lightColor}, 1},
+        std::pair{PhongLightSource{camera, {{}, {-4.0f, 2.0f, -12.0f}}, lightColor}, 2},
+        std::pair{PhongLightSource{camera, {{}, {0.0f, 5.0f, 0.0f}}, lightColor}, 3},
+        std::pair{
+            PhongLightSource{camera, {{0.0f, 1.0f, 1.0f}}, glm::vec3{1.0f}, PhongLightType::GlobalDirectional}, 1
+        },
+        std::pair{
+            PhongLightSource{
+                camera,
+                {
+                    camera.GetFront(),
+                    camera.GetPosition(),
+                    Rotation::ToRadians(20.0f),
+                    Rotation::ToRadians(60.0f)
+                },
+                glm::vec3{0.5f, 0.5f, 0.2f},
+                PhongLightType::Spotlight,
+                0.0f,
+                4.0f,
+                2.0f
+            },
+            0
+        }
+    };
 
     const ShaderProgram& texturedProgram{
         {"src/ext/texturedVertexShader.vert", GL_VERTEX_SHADER},
@@ -261,6 +299,7 @@ int main()
     const Texture& specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
     const Texture& emissionMap{"res/container2_emit.jpg", GL_TEXTURE_2D, true};
 
+    bool isLightOn{true}, isLightKeyToggle{true};
     float deltaTime{}, lastFrame{};
     int fpsSampleCount{1};
 #define dt(var) (deltaTime * (var))
@@ -302,6 +341,17 @@ int main()
             camera.MovePositionEuler(0, 0, dt(moveSpeed));
         _OnKeyPressed(window, GLFW_KEY_F)
             camera.MovePositionEuler(0, 0, -dt(moveSpeed));
+        _OnKeyPressed(window, GLFW_KEY_L)
+        {
+            if (isLightKeyToggle)
+                isLightOn = !isLightOn;
+            lightSources[6].first.Ambient = 0.0f;
+            lightSources[6].first.Diffuse = isLightOn ? 4.0f : 0.0f;
+            lightSources[6].first.Specular = isLightOn ? 2.0f : 0.0f;
+            isLightKeyToggle = false;
+        }
+        _OnKeyReleased(window, GLFW_KEY_L)
+            isLightKeyToggle = true;
         camera.SetEulerAnglesRaw(Rotation::ToRadians(pitch), Rotation::ToRadians(yaw - 90.0f), camera.GetRollRad());
 
         {
@@ -326,13 +376,11 @@ int main()
                         100.0f)
                 };
                 cubeMatrixPipeline.SetMatrixPipeline(shaderProgram);
-
-                // Do lighting
-                cubeMaterial.SendMaterial(shaderProgram);
-                lightSource.Emit(shaderProgram);
-
                 glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
             }
+            // Do lighting
+            cubeMaterial.SendMaterial(shaderProgram);
+            EmitAllLights(shaderProgram, lightSources);
             // Finish drawing box
             shaderProgram.Unuse();
             vaoArray.Unbind();
@@ -347,6 +395,7 @@ int main()
             specularMap.Bind();
             Texture::Activate(GL_TEXTURE2);
             emissionMap.Bind();
+
             for (auto& texturedPosition : texturedPositions)
             {
                 const RenderMatrix& texturedMatrixPipeline{
@@ -359,14 +408,14 @@ int main()
                         100.0f)
                 };
                 texturedMatrixPipeline.SetMatrixPipeline(texturedProgram);
-
-                // Do lighting
-                texturedMaterial.SendMaterial(texturedProgram);
-                lightSource.Emit(texturedProgram);
-                texturedProgram.SetUFFloat("time", static_cast<float>(glfwGetTime()));
-
                 glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
             }
+
+            // Do lighting
+            texturedMaterial.SendMaterial(texturedProgram);
+            EmitAllLights(texturedProgram, lightSources);
+            texturedProgram.SetUFFloat("time", static_cast<float>(glfwGetTime()));
+
             diffuseMap.Unbind();
             specularMap.Unbind();
             texturedProgram.Unuse();
@@ -377,32 +426,43 @@ int main()
             // Start drawing light box
             lightSourceProgram.Use();
             lightSourceArray.Bind();
-            const RenderMatrix& lightMatrixPipeline{
-                MatrixHelper::TransformationMatrix(
-                    lightData.LightPosition,
-                    Rotation({0.0f, 1.0f, 0.0f},
-                             static_cast<float>(glfwGetTime()) * 10.0f),
-                    glm::vec3{0.3f}),
-                camera.GetView(),
-                MatrixHelper::PerspectiveMatrix(
-                    Rotation::ToRadians(fov),
-                    w / h,
-                    0.1f,
-                    100.0f)
-            };
-            lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
-
-            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+            for (auto& lightSource : lightSources)
+            {
+                if (lightSource.first.LightType == PhongLightType::Point)
+                {
+                    const RenderMatrix& lightMatrixPipeline{
+                        MatrixHelper::TransformationMatrix(
+                            lightSource.first.LightData.LightPosition,
+                            Rotation({0.0f, 1.0f, 0.0f},
+                                     static_cast<float>(glfwGetTime()) * 10.0f),
+                            glm::vec3{0.3f}),
+                        camera.GetView(),
+                        MatrixHelper::PerspectiveMatrix(
+                            Rotation::ToRadians(fov),
+                            w / h,
+                            0.1f,
+                            100.0f)
+                    };
+                    lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
+                    glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+                }
+            }
             // Finish drawing light box
             lightSourceProgram.Unuse();
             lightSourceArray.Unbind();
         }
 
-        lightData.LightPosition.x = cos(static_cast<float>(glfwGetTime())) * 3.0f;
-        lightData.LightPosition.z = sin(static_cast<float>(glfwGetTime())) * 3.0f;
-        HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
-                 0.3f,
-                 1.0f);
+        //for (auto& lightSource : lightSources)
+        //{
+        //    if (lightSource.LightType == PhongLightType::Point)
+        //    {
+        //        lightSource.LightData.LightPosition.x = cos(static_cast<float>(glfwGetTime())) * 1.2f;
+        //        lightSource.LightData.LightPosition.z = sin(static_cast<float>(glfwGetTime())) * 1.2f;
+        //    }
+        //}
+        //HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
+        //         0.3f,
+        //         1.0f);
 
         glfwSwapBuffers(window.Handle); /* Swap front and back buffers */
         glfwPollEvents(); /* Poll for and process events */

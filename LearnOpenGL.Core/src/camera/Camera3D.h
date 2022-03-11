@@ -22,11 +22,12 @@ namespace camera
         void MovePositionEuler(float x, float y, float z);
 
         glm::mat4 GetView() const;
-
-        float GetPitchRad() const;
-        float GetYawRad() const;
-        float GetRollRad() const;
-        const glm::vec3& GetPosition() const;
+        glm::vec3& GetFront();
+        glm::vec3& GetUp();
+        float& GetPitchRad();
+        float& GetYawRad();
+        float& GetRollRad();
+        glm::vec3& GetPosition();
     private:
         void ChangeEulerAngles();
         glm::vec3 front;

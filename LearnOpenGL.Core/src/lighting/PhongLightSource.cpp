@@ -1,5 +1,7 @@
 #include "PhongLightSource.h"
 
+#include <sstream>
+
 #include <glm/trigonometric.hpp>
 
 #include "PhongLightType.h"
@@ -8,7 +10,7 @@
 
 namespace lighting
 {
-    PhongLightSource::PhongLightSource(const camera::Camera3D& camera,
+    PhongLightSource::PhongLightSource(camera::Camera3D& camera,
                                        PhongLightData& lightData,
                                        glm::vec3& lightColor,
                                        PhongLightType lightType,
@@ -25,42 +27,66 @@ namespace lighting
     {
     }
 
-    void PhongLightSource::Emit(const rendering::ShaderProgram& program) const
+    PhongLightSource::PhongLightSource(camera::Camera3D& camera,
+                                       const PhongLightData& lightData,
+                                       const glm::vec3& lightColor,
+                                       PhongLightType lightType,
+                                       float ambient,
+                                       float diffuse,
+                                       float specular) :
+        LightData(const_cast<PhongLightData&>(lightData)),
+        LightColor(const_cast<glm::vec3&>(lightColor)),
+        Ambient(ambient),
+        Diffuse(diffuse),
+        Specular(specular),
+        LightType(lightType),
+        camera(camera)
     {
+    }
+
+
+#define putsH(value) (head.str() + (value)).c_str()
+
+    void PhongLightSource::Emit(const rendering::ShaderProgram& program, int index) const
+    {
+        std::stringstream head{};
         switch (LightType)
         {
         case PhongLightType::GlobalDirectional:
-            program.SetUFVector3("light.lightData.lightDirection",
+            head << "globalDirLights[" << index << "]";
+            program.SetUFVector3(putsH(".lightData.lightDirection"),
                                  LightData.LightDirection.x,
                                  LightData.LightDirection.y,
                                  LightData.LightDirection.z);
             break;
         case PhongLightType::Point:
-            program.SetUFVector3("light.lightData.lightPosition",
+            head << "pointLights[" << index << "]";
+            program.SetUFVector3(putsH(".lightData.lightPosition"),
                                  LightData.LightPosition.x,
                                  LightData.LightPosition.y,
                                  LightData.LightPosition.z);
             break;
         case PhongLightType::Spotlight:
-            program.SetUFVector3("light.lightData.lightDirection",
+            head << "spotLights[" << index << "]";
+            program.SetUFVector3(putsH(".lightData.lightDirection"),
                                  LightData.LightDirection.x,
                                  LightData.LightDirection.y,
                                  LightData.LightDirection.z);
-            program.SetUFVector3("light.lightData.lightPosition",
+            program.SetUFVector3(putsH(".lightData.lightPosition"),
                                  LightData.LightPosition.x,
                                  LightData.LightPosition.y,
                                  LightData.LightPosition.z);
 
-            program.SetUFFloat("light.lightData.lightInnerCutoff", glm::cos(LightData.LightInnerCutoff));
-            program.SetUFFloat("light.lightData.lightOuterCutoff", glm::cos(LightData.LightOuterCutoff));
+            program.SetUFFloat(putsH(".lightData.lightInnerCutoff"), glm::cos(LightData.LightInnerCutoff));
+            program.SetUFFloat(putsH(".lightData.lightOuterCutoff"), glm::cos(LightData.LightOuterCutoff));
             break;
         }
 
         program.SetUFVector3("cameraPosition", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-        program.SetUFUint32("light.lightType", static_cast<uint32_t>(LightType));
-        program.SetUFVector3("light.lightColor", LightColor.x, LightColor.y, LightColor.z);
-        program.SetUFFloat("light.ambient", Ambient);
-        program.SetUFFloat("light.diffuse", Diffuse);
-        program.SetUFFloat("light.specular", Specular);
+        program.SetUFUint32(putsH(".lightType"), static_cast<uint32_t>(LightType));
+        program.SetUFVector3(putsH(".lightColor"), LightColor.x, LightColor.y, LightColor.z);
+        program.SetUFFloat(putsH(".ambient"), Ambient);
+        program.SetUFFloat(putsH(".diffuse"), Diffuse);
+        program.SetUFFloat(putsH(".specular"), Specular);
     }
 }

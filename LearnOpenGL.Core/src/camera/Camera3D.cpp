@@ -73,22 +73,32 @@ namespace camera
         ChangeEulerAngles();
     }
 
-    float Camera3D::GetPitchRad() const
+    glm::vec3& Camera3D::GetFront()
+    {
+        return front;
+    }
+
+    glm::vec3& Camera3D::GetUp()
+    {
+        return up;
+    }
+
+    float& Camera3D::GetPitchRad()
     {
         return pitchRad;
     }
 
-    float Camera3D::GetYawRad() const
+    float& Camera3D::GetYawRad()
     {
         return yawRad;
     }
 
-    float Camera3D::GetRollRad() const
+    float& Camera3D::GetRollRad()
     {
         return rollRad;
     }
 
-    const glm::vec3& Camera3D::GetPosition() const
+    glm::vec3& Camera3D::GetPosition()
     {
         return Position;
     }
