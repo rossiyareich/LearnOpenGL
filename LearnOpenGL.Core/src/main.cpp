@@ -81,7 +81,7 @@ void OnScrollChanged(GLFWwindow* window, double xoffset, double yoffset)
 int main()
 {
     Window window{"LearnOpenGL", WINDOW_W, WINDOW_H};
-    ConsoleLogger logger{};
+    std::unique_ptr<ILogger> logger{std::make_unique<ConsoleLogger>()};
 
     GLFWframebuffersizefun OnResized{
         [](GLFWwindow* window, int w, int h)
@@ -110,7 +110,7 @@ int main()
 
     std::stringstream t_stringstream{};
     t_stringstream << "OpenGL Version: " << glGetString(GL_VERSION);
-    logger.WriteLine(t_stringstream.str().c_str());
+    logger->WriteLine(t_stringstream.str().c_str());
 
 #pragma region OpenGL_Tuning
     //#define WIREFRAME
@@ -254,7 +254,7 @@ int main()
         if (fpsSampleCount % FPS_SAMPLE_RATE == 0)
         {
             fpsSampleCount = 0;
-            logger.WriteLine(("FPS: " + std::to_string((1 / deltaTime))).c_str());
+            logger->WriteLine(("FPS: " + std::to_string((1 / deltaTime))).c_str());
         }
         fpsSampleCount++;
 
@@ -382,8 +382,8 @@ int main()
         lightPosition.x = cos(static_cast<float>(glfwGetTime())) * 3.0f;
         lightPosition.z = sin(static_cast<float>(glfwGetTime())) * 3.0f;
         HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
-                 0.3,
-                 1);
+                 0.3f,
+                 1.0f);
 
         glfwSwapBuffers(window.Handle); /* Swap front and back buffers */
         glfwPollEvents(); /* Poll for and process events */
