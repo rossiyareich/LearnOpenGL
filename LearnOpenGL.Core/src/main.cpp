@@ -219,7 +219,7 @@ int main()
     lightSourceArray.Unbind();
     glm::vec3 lightPosition{0.0f, 2.0f, 0.0f};
     glm::vec3 lightColor{1.0f};
-    PhongLightSource lightSource{camera, lightPosition, lightColor, 0.2f, 0.3f, 2.0f};
+    PhongLightSource lightSource{camera, lightPosition, lightColor};
 
     const ShaderProgram& texturedProgram{
         {"src/ext/texturedVertexShader.vert", GL_VERTEX_SHADER},
@@ -238,8 +238,9 @@ int main()
     texturedArray.Unbind();
     glm::vec3 texturedPosition{5.0f, 3.0f, 0.0f};
     PhongTexturedMaterial texturedMaterial{};
-    Texture diffuseMap{"res/container2.png", GL_TEXTURE_2D, true};
-    Texture specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
+    const Texture& diffuseMap{"res/container2.png", GL_TEXTURE_2D, true};
+    const Texture& specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
+    const Texture& emissionMap{"res/container2_emit.jpg", GL_TEXTURE_2D, true};
 
     float deltaTime{}, lastFrame{};
     int fpsSampleCount{1};
@@ -336,10 +337,13 @@ int main()
             diffuseMap.Bind();
             Texture::Activate(GL_TEXTURE1);
             specularMap.Bind();
+            Texture::Activate(GL_TEXTURE2);
+            emissionMap.Bind();
 
             // Do lighting
             texturedMaterial.SendMaterial(texturedProgram);
             lightSource.Emit(texturedProgram);
+            texturedProgram.SetUFFloat("time", static_cast<float>(glfwGetTime()));
 
             glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
 
@@ -368,16 +372,17 @@ int main()
                     100.0f)
             };
             lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
+
             glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
             // Finish drawing light box
             lightSourceProgram.Unuse();
             lightSourceArray.Unbind();
         }
 
-        lightPosition.x = cos(static_cast<float>(glfwGetTime())) * 1.5f;
-        lightPosition.z = sin(static_cast<float>(glfwGetTime())) * 1.5f;
+        lightPosition.x = cos(static_cast<float>(glfwGetTime())) * 3.0f;
+        lightPosition.z = sin(static_cast<float>(glfwGetTime())) * 3.0f;
         HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
-                 1,
+                 0.3,
                  1);
 
         glfwSwapBuffers(window.Handle); /* Swap front and back buffers */

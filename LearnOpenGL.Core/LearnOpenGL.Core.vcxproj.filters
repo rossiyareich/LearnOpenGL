@@ -140,5 +140,8 @@
     <CopyFileToFolders Include="res\container2_specular.png">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="res\container2_emit.jpg">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
