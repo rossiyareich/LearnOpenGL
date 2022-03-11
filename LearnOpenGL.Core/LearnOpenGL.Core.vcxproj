@@ -167,6 +167,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\lighting\PhongLightData.cpp" />
     <ClCompile Include="src\lighting\PhongLightSource.cpp" />
     <ClCompile Include="src\camera\Camera3D.cpp" />
     <ClCompile Include="src\lighting\PhongMaterial.cpp" />
@@ -184,6 +185,8 @@
     <ClCompile Include="src\window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\lighting\PhongLightData.h" />
+    <ClInclude Include="src\lighting\PhongLightType.h" />
     <ClInclude Include="src\lighting\PhongMaterial.h" />
     <ClInclude Include="src\lighting\PhongTexturedMaterial.h" />
     <ClInclude Include="src\logging\ConsoleLogger.h" />

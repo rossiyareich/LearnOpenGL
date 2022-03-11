@@ -43,28 +43,31 @@ static bool firstMouse{true};
 
 void OnCursorPositionChanged(GLFWwindow* window, double xpos, double ypos)
 {
-    if (firstMouse)
+    OnKeyReleasedPtr(window, GLFW_KEY_LEFT_CONTROL)
     {
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        double xoffset = xpos - lastX;
+        double yoffset = lastY - ypos; // reverse because y is reversed
         lastX = xpos;
         lastY = ypos;
-        firstMouse = false;
+
+        xoffset *= MOUSE_SENSITIVITY;
+        yoffset *= MOUSE_SENSITIVITY;
+
+        yaw += static_cast<float>(xoffset);
+        pitch += static_cast<float>(yoffset);
+
+        if (pitch > 90.0f)
+            pitch = 90.0f;
+        if (pitch < -90.0f)
+            pitch = -90.0f;
     }
-
-    double xoffset = xpos - lastX;
-    double yoffset = lastY - ypos; // reverse because y is reversed
-    lastX = xpos;
-    lastY = ypos;
-
-    xoffset *= MOUSE_SENSITIVITY;
-    yoffset *= MOUSE_SENSITIVITY;
-
-    yaw += static_cast<float>(xoffset);
-    pitch += static_cast<float>(yoffset);
-
-    if (pitch > 90.0f)
-        pitch = 90.0f;
-    if (pitch < -90.0f)
-        pitch = -90.0f;
 }
 
 static float fov{45.0f};
@@ -217,9 +220,14 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
     lightSourceArray.Unbind();
-    glm::vec3 lightPosition{0.0f, 2.0f, 0.0f};
+    PhongLightData lightData = {
+        {0.0, 0.0f, -1.0f},
+        {0.0f, 2.0f, 0.0f},
+        Rotation::ToRadians(10.0f),
+        Rotation::ToRadians(20.0f)
+    };
     glm::vec3 lightColor{1.0f};
-    PhongLightSource lightSource{camera, lightPosition, lightColor};
+    PhongLightSource lightSource{camera, lightData, lightColor, PhongLightType::Spotlight, 0.5f, 1.0f, 2.0f};
 
     const ShaderProgram& texturedProgram{
         {"src/ext/texturedVertexShader.vert", GL_VERTEX_SHADER},
@@ -236,7 +244,18 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 6));
     glEnableVertexAttribArray(2); // Use vertex attributes @ location = 2
     texturedArray.Unbind();
-    glm::vec3 texturedPosition{5.0f, 3.0f, 0.0f};
+    glm::vec3 texturedPositions[]{
+        glm::vec3(0.0f, 0.0f, -15.0f),
+        glm::vec3(2.0f, 5.0f, -14.0f),
+        glm::vec3(-1.5f, -2.2f, -13.0f),
+        glm::vec3(-3.8f, -2.0f, -12.0f),
+        glm::vec3(2.4f, -0.4f, -11.0f),
+        glm::vec3(-1.7f, 3.0f, -10.0f),
+        glm::vec3(1.3f, -2.0f, -9.0f),
+        glm::vec3(1.5f, 2.0f, -8.0f),
+        glm::vec3(1.5f, 0.2f, -7.0f),
+        glm::vec3(-1.3f, 1.0f, -6.0f)
+    };
     PhongTexturedMaterial texturedMaterial{};
     const Texture& diffuseMap{"res/container2.png", GL_TEXTURE_2D, true};
     const Texture& specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
@@ -322,34 +341,34 @@ int main()
         {
             texturedProgram.Use();
             texturedArray.Bind();
-            const RenderMatrix& texturedMatrixPipeline{
-                MatrixHelper::TransformationMatrix(texturedPosition),
-                camera.GetView(),
-                MatrixHelper::PerspectiveMatrix(
-                    Rotation::ToRadians(fov),
-                    w / h,
-                    0.1f,
-                    100.0f)
-            };
-            texturedMatrixPipeline.SetMatrixPipeline(texturedProgram);
-
             Texture::Activate(GL_TEXTURE0);
             diffuseMap.Bind();
             Texture::Activate(GL_TEXTURE1);
             specularMap.Bind();
             Texture::Activate(GL_TEXTURE2);
             emissionMap.Bind();
+            for (auto& texturedPosition : texturedPositions)
+            {
+                const RenderMatrix& texturedMatrixPipeline{
+                    MatrixHelper::TransformationMatrix(texturedPosition),
+                    camera.GetView(),
+                    MatrixHelper::PerspectiveMatrix(
+                        Rotation::ToRadians(fov),
+                        w / h,
+                        0.1f,
+                        100.0f)
+                };
+                texturedMatrixPipeline.SetMatrixPipeline(texturedProgram);
 
-            // Do lighting
-            texturedMaterial.SendMaterial(texturedProgram);
-            lightSource.Emit(texturedProgram);
-            texturedProgram.SetUFFloat("time", static_cast<float>(glfwGetTime()));
+                // Do lighting
+                texturedMaterial.SendMaterial(texturedProgram);
+                lightSource.Emit(texturedProgram);
+                texturedProgram.SetUFFloat("time", static_cast<float>(glfwGetTime()));
 
-            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
-
+                glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+            }
             diffuseMap.Unbind();
             specularMap.Unbind();
-
             texturedProgram.Unuse();
             texturedArray.Unbind();
         }
@@ -360,7 +379,7 @@ int main()
             lightSourceArray.Bind();
             const RenderMatrix& lightMatrixPipeline{
                 MatrixHelper::TransformationMatrix(
-                    lightPosition,
+                    lightData.LightPosition,
                     Rotation({0.0f, 1.0f, 0.0f},
                              static_cast<float>(glfwGetTime()) * 10.0f),
                     glm::vec3{0.3f}),
@@ -379,8 +398,8 @@ int main()
             lightSourceArray.Unbind();
         }
 
-        lightPosition.x = cos(static_cast<float>(glfwGetTime())) * 3.0f;
-        lightPosition.z = sin(static_cast<float>(glfwGetTime())) * 3.0f;
+        lightData.LightPosition.x = cos(static_cast<float>(glfwGetTime())) * 3.0f;
+        lightData.LightPosition.z = sin(static_cast<float>(glfwGetTime())) * 3.0f;
         HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
                  0.3f,
                  1.0f);
