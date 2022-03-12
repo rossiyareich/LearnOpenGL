@@ -87,7 +87,7 @@ void EmitAllLights(const ShaderProgram& program, const std::array<std::pair<Phon
 {
     for (const auto& light : lights)
     {
-        auto [source, index] = light;
+        auto& [source, index] = light;
         source.Emit(program, index);
     }
 }
