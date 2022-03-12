@@ -177,6 +177,7 @@
     <ClCompile Include="src\manipulation\RenderMatrix.cpp" />
     <ClCompile Include="src\manipulation\Rotation.cpp" />
     <ClCompile Include="src\manipulation\MatrixHelper.cpp" />
+    <ClCompile Include="src\model\Mesh.cpp" />
     <ClCompile Include="src\rendering\Shader.cpp" />
     <ClCompile Include="src\rendering\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\Texture.cpp" />
@@ -199,6 +200,9 @@
     <ClInclude Include="src\manipulation\RenderMatrix.h" />
     <ClInclude Include="src\manipulation\Rotation.h" />
     <ClInclude Include="src\manipulation\MatrixHelper.h" />
+    <ClInclude Include="src\model\Mesh.h" />
+    <ClInclude Include="src\model\TextureData.h" />
+    <ClInclude Include="src\model\Vertex.h" />
     <ClInclude Include="src\rendering\Shader.h" />
     <ClInclude Include="src\rendering\ShaderProgram.h" />
     <ClInclude Include="src\rendering\Texture.h" />

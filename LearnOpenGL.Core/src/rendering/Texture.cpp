@@ -40,6 +40,28 @@ namespace rendering
         Unbind();
     }
 
+    Texture::Texture(int width, int height, const GLenum target, const GLenum colorFormat, const uint8_t* data) :
+        TextureID{},
+        TextureTarget{target}
+    {
+        assert(data);
+        glGenTextures(1, &TextureID);
+        Bind();
+
+        switch (target)
+        {
+        case GL_TEXTURE_2D:
+            glTexImage2D(TextureTarget, 0, GL_RGBA, width, height, 0, colorFormat, GL_UNSIGNED_BYTE, data);
+            break;
+        default:
+            assert(false);
+        }
+
+        glGenerateMipmap(TextureTarget);
+        Unbind();
+    }
+
+
     Texture::~Texture()
     {
         glDeleteTextures(1, &TextureID);
