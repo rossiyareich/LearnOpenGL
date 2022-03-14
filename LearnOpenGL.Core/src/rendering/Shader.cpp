@@ -10,6 +10,8 @@
 
 #include "../helpers/Constants.h"
 
+#include "../logging/ConsoleLogger.h"
+
 namespace rendering
 {
     Shader::Shader(const char* const path, const GLenum type) : ShaderID{glCreateShader(type)}
@@ -34,7 +36,9 @@ namespace rendering
         {
             glErrorLog infoLog;
             glGetShaderInfoLog(ShaderID, GL_ERROR_LENGTH, nullptr, infoLog);
-            std::cout << infoLog << std::endl;
+            logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Error);
+            logging::ConsoleLogger::Logger->WriteLine(infoLog);
+            logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Debug);
             assert(false);
         }
     }

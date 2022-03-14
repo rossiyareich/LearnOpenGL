@@ -1,5 +1,6 @@
 ﻿#include "ConsoleLogger.h"
 
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -12,10 +13,14 @@ namespace logging
 {
     ConsoleLogger::ConsoleLogger() : ILogger{}
     {
+        assert(!Logger);
+        Logger = this;
     }
 
     ConsoleLogger::ConsoleLogger(const LogLevel& logLevel) : ILogger{}
     {
+        assert(!Logger);
+        Logger = this;
         ConsoleLogger::SetLogLevel(logLevel);
     }
 
@@ -29,7 +34,7 @@ namespace logging
         return logLevel;
     }
 
-    void ConsoleLogger::WriteLine(const char* msg) const
+    void ConsoleLogger::WriteNoMsg() const
     {
         time_t now = std::time(nullptr);
         tm localTime{};
@@ -51,7 +56,22 @@ namespace logging
         default:
             throw std::exception("Not supported");
         }
+    }
 
+    void ConsoleLogger::WriteLine(const char* msg) const
+    {
+        WriteNoMsg();
         std::cout << msg << '\n';
+    }
+
+    void ConsoleLogger::WriteLine(const std::string& msg) const
+    {
+        WriteNoMsg();
+        std::cout << msg << '\n';
+    }
+
+    ConsoleLogger::~ConsoleLogger()
+    {
+        Logger = nullptr;
     }
 }

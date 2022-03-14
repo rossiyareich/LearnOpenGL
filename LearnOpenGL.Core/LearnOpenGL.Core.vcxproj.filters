@@ -66,6 +66,9 @@
     <ClCompile Include="src\model\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\model\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\Shader.h">
@@ -137,6 +140,9 @@
     <ClInclude Include="src\model\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\model\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\awesomeface.png">
@@ -162,6 +168,26 @@
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="res\container2_emit.jpg">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="src\ext\meshFragmentShader.frag" />
+    <CopyFileToFolders Include="src\ext\meshVertexShader.vert" />
+    <CopyFileToFolders Include="res\backpack\ao.jpg">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="res\backpack\backpack.mtl" />
+    <CopyFileToFolders Include="res\backpack\backpack.obj" />
+    <CopyFileToFolders Include="res\backpack\diffuse.jpg">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="res\backpack\normal.png">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="res\backpack\roughness.jpg">
+      <Filter>Resource Files</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="res\backpack\source_attribution.txt" />
+    <CopyFileToFolders Include="res\backpack\specular.jpg">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
   </ItemGroup>

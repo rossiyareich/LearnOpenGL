@@ -7,7 +7,8 @@ namespace model
 {
     struct TextureData
     {
-        rendering::Texture& Texture;
-        const std::string& RepresentationType; // Diffuse, Specular, etc.
+        rendering::Texture Texture;
+        const std::string RepresentationType; // Diffuse, Specular, etc.
+        const std::string RelativePath;
     };
 }

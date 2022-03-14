@@ -6,21 +6,24 @@
 
 #include "../rendering/Buffer.h"
 #include "../rendering/VertexArray.h"
+#include "../rendering/ShaderProgram.h"
 
 namespace model
 {
     class Mesh
     {
     public:
-        std::vector<model::Vertex> Vertices;
+        std::vector<Vertex> Vertices;
         std::vector<uint32_t> Indices;
-        std::vector<model::TextureData> TextureData;
-        Mesh(const std::vector<model::Vertex>& vertices,
+        std::vector<TextureData> TextureData;
+        uint32_t Shininess;
+        Mesh(const std::vector<Vertex>& vertices,
              const std::vector<uint32_t>& indices,
              const std::vector<model::TextureData>& textureData);
+        void Draw(const rendering::ShaderProgram& program);
     private:
-        rendering::Buffer &vbo, &ebo;
-        rendering::VertexArray& vao;
+        rendering::Buffer vbo, ebo;
+        rendering::VertexArray vao;
         void SetupMesh();
     };
 }

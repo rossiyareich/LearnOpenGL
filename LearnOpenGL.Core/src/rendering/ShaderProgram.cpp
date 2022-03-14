@@ -5,6 +5,8 @@
 
 #include "../helpers/Constants.h"
 
+#include "../logging/ConsoleLogger.h"
+
 namespace rendering
 {
     ShaderProgram::ShaderProgram() : ProgramID{}
@@ -23,7 +25,10 @@ namespace rendering
         {
             glErrorLog infoLog;
             glGetProgramInfoLog(ProgramID, GL_ERROR_LENGTH, nullptr, infoLog);
-            std::cout << infoLog << std::endl;
+            logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Error);
+            logging::ConsoleLogger::Logger->WriteLine(infoLog);
+            logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Debug);
+
             assert(false);
         }
     }

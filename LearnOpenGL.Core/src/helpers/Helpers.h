@@ -2,6 +2,8 @@
 #include <cassert>
 #include <cstdint>
 
+#include "../logging/ConsoleLogger.h"
+
 #define decltypearraymember(array) decltype((array)[0])
 #define carraysize(array) (sizeof((array)) / sizeof(decltypearraymember((array))))
 
@@ -10,8 +12,12 @@ T __assertRet(const T ptr, const uint32_t line, const char* const file, const ch
 {
     if (ptr == TAssertationFailed)
     {
-        std::cout << "Assertation failed at LINE: " << line << ", FILE: " << file << ", FUNCTION: " << function <<
-            std::endl;
+        std::stringstream ss{};
+        ss << "Assertation failed at LINE: " << line << ", FILE: " << file << ", FUNCTION: " << function;
+        logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Error);
+        logging::ConsoleLogger::Logger->WriteLine(ss.str());
+        logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Debug);
+
         assert(false);
     }
 

@@ -12,6 +12,7 @@ namespace logging
 
         virtual ~ILogger() = default;
         virtual void WriteLine(const char* msg) const = 0;
+        virtual void WriteLine(const std::string& msg) const = 0;
         virtual void SetLogLevel(const LogLevel& logLevel) = 0;
         virtual const LogLevel& GetLogLevel() const = 0;
     protected:

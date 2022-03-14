@@ -26,6 +26,8 @@
 #include "logging/ConsoleLogger.h"
 #include "logging/LogLevel.h"
 
+#include "model/Model.h"
+
 #include "rendering/Texture.h"
 
 using namespace rendering;
@@ -34,6 +36,7 @@ using namespace manipulation;
 using namespace camera;
 using namespace lighting;
 using namespace logging;
+using namespace model;
 
 static float w = WINDOW_W;
 static float h = WINDOW_H;
@@ -94,8 +97,8 @@ void EmitAllLights(const ShaderProgram& program, const std::array<std::pair<Phon
 
 int main()
 {
-    Window window{"LearnOpenGL", WINDOW_W, WINDOW_H};
     std::unique_ptr<ILogger> logger{std::make_unique<ConsoleLogger>()};
+    Window window{"LearnOpenGL", WINDOW_W, WINDOW_H};
 
     GLFWframebuffersizefun OnResized{
         [](GLFWwindow* window, int w, int h)
@@ -122,9 +125,11 @@ int main()
 
     glfwSetScrollCallback(window.Handle, OnScrollChanged);
 
-    std::stringstream t_stringstream{};
-    t_stringstream << "OpenGL Version: " << glGetString(GL_VERSION);
-    logger->WriteLine(t_stringstream.str().c_str());
+    {
+        std::stringstream t_stringstream{};
+        t_stringstream << "OpenGL Version: " << glGetString(GL_VERSION);
+        ConsoleLogger::Logger->WriteLine(t_stringstream.str());
+    }
 
 #pragma region OpenGL_Tuning
     //#define WIREFRAME
@@ -254,8 +259,8 @@ int main()
                 {
                     camera.GetFront(),
                     camera.GetPosition(),
-                    Rotation::ToRadians(20.0f),
-                    Rotation::ToRadians(60.0f)
+                    Rotation::ToRadians(12.0f),
+                    Rotation::ToRadians(26.0f)
                 },
                 glm::vec3{0.5f, 0.5f, 0.2f},
                 PhongLightType::Spotlight,
@@ -299,6 +304,12 @@ int main()
     const Texture& specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
     const Texture& emissionMap{"res/container2_emit.jpg", GL_TEXTURE_2D, true};
 
+    const ShaderProgram& backpackProgram{
+        {"src/ext/meshVertexShader.vert", GL_VERTEX_SHADER},
+        {"src/ext/meshFragmentShader.frag", GL_FRAGMENT_SHADER}
+    };
+    Model backpackModel{"/res/backpack/backpack.obj"};
+
     bool isLightOn{true}, isLightKeyToggle{true};
     float deltaTime{}, lastFrame{};
     int fpsSampleCount{1};
@@ -312,7 +323,7 @@ int main()
         if (fpsSampleCount % FPS_SAMPLE_RATE == 0)
         {
             fpsSampleCount = 0;
-            logger->WriteLine(("FPS: " + std::to_string((1 / deltaTime))).c_str());
+            ConsoleLogger::Logger->WriteLine("FPS: " + std::to_string((1 / deltaTime)));
         }
         fpsSampleCount++;
 
@@ -345,9 +356,10 @@ int main()
         {
             if (isLightKeyToggle)
                 isLightOn = !isLightOn;
-            lightSources[6].first.Ambient = 0.0f;
-            lightSources[6].first.Diffuse = isLightOn ? 4.0f : 0.0f;
-            lightSources[6].first.Specular = isLightOn ? 2.0f : 0.0f;
+            auto& [source, index] = lightSources[6];
+            source.Ambient = 0.0f;
+            source.Diffuse = isLightOn ? 4.0f : 0.0f;
+            source.Specular = isLightOn ? 2.0f : 0.0f;
             isLightKeyToggle = false;
         }
         _OnKeyReleased(window, GLFW_KEY_L)
@@ -426,13 +438,13 @@ int main()
             // Start drawing light box
             lightSourceProgram.Use();
             lightSourceArray.Bind();
-            for (auto& lightSource : lightSources)
+            for (auto&& [source, index] : lightSources)
             {
-                if (lightSource.first.LightType == PhongLightType::Point)
+                if (source.LightType == PhongLightType::Point)
                 {
                     const RenderMatrix& lightMatrixPipeline{
                         MatrixHelper::TransformationMatrix(
-                            lightSource.first.LightData.LightPosition,
+                            source.LightData.LightPosition,
                             Rotation({0.0f, 1.0f, 0.0f},
                                      static_cast<float>(glfwGetTime()) * 10.0f),
                             glm::vec3{0.3f}),
@@ -450,6 +462,29 @@ int main()
             // Finish drawing light box
             lightSourceProgram.Unuse();
             lightSourceArray.Unbind();
+        }
+
+        {
+            backpackProgram.Use();
+
+            const RenderMatrix& backpackMatrixPipeline{
+                MatrixHelper::TransformationMatrix({10.0f, 0.0f, 0.0f}),
+                camera.GetView(),
+                MatrixHelper::PerspectiveMatrix(
+                    Rotation::ToRadians(fov),
+                    w / h,
+                    0.1f,
+                    100.0f)
+            };
+
+            backpackMatrixPipeline.SetMatrixPipeline(backpackProgram);
+
+            // Do lighting
+            EmitAllLights(backpackProgram, lightSources);
+
+            backpackProgram.SetUFUint32("texturedMaterial.shininess", 32);
+            backpackModel.Draw(backpackProgram);
+            backpackProgram.Unuse();
         }
 
         //for (auto& lightSource : lightSources)
