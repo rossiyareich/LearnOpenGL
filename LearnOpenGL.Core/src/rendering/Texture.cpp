@@ -40,6 +40,41 @@ namespace rendering
         Unbind();
     }
 
+    Texture::Texture(const char* const file, const GLenum target, const bool flipped,
+                     std::function<void (const GLenum target)> postAction) : TextureID{},
+                                                                             TextureTarget{target}
+    {
+        int width, height, colorChannels;
+        stbi_set_flip_vertically_on_load(flipped);
+        auto* data = stbi_load(file, &width, &height, &colorChannels, 0);
+        assert(data);
+
+        glGenTextures(1, &TextureID);
+        Bind();
+
+        GLenum format{};
+        if (colorChannels == 3)
+            format = GL_RGB;
+        else if (colorChannels == 4)
+            format = GL_RGBA;
+        else
+            format = GL_RGB;
+
+        switch (target)
+        {
+        case GL_TEXTURE_2D:
+            glTexImage2D(TextureTarget, 0, GL_RGBA, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            break;
+        default:
+            assert(false);
+        }
+
+        glGenerateMipmap(TextureTarget);
+        postAction(target);
+        stbi_image_free(data);
+        Unbind();
+    }
+
     Texture::~Texture()
     {
         glDeleteTextures(1, &TextureID);

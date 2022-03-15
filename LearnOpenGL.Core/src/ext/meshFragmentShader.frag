@@ -8,8 +8,8 @@
 #define NR_POINT_LIGHTS 4
 #define NR_SPOT_LIGHTS 2
 
-#define NR_TEXTURE_DIFFUSE 3
-#define NR_TEXTURE_SPECULAR 2
+#define NR_TEXTURE_DIFFUSE 1
+#define NR_TEXTURE_SPECULAR 1
 #define NR_TEXTURE_EMISSION 1
 
 out vec4 FragColor;

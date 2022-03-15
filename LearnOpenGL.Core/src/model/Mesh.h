@@ -22,8 +22,8 @@ namespace model
              const std::vector<model::TextureData>& textureData);
         void Draw(const rendering::ShaderProgram& program);
     private:
-        rendering::Buffer vbo, ebo;
         rendering::VertexArray vao;
+        rendering::Buffer vbo, ebo;
         void SetupMesh();
     };
 }

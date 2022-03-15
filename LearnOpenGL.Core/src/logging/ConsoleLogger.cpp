@@ -13,16 +13,14 @@ namespace logging
 {
     ConsoleLogger::ConsoleLogger() : ILogger{}
     {
-        assert(!Logger);
-        Logger = this;
     }
 
-    ConsoleLogger::ConsoleLogger(const LogLevel& logLevel) : ILogger{}
+    ConsoleLogger& ConsoleLogger::Get()
     {
-        assert(!Logger);
-        Logger = this;
-        ConsoleLogger::SetLogLevel(logLevel);
+        static ConsoleLogger logger{};
+        return logger;
     }
+
 
     void ConsoleLogger::SetLogLevel(const LogLevel& logLevel)
     {
@@ -68,10 +66,5 @@ namespace logging
     {
         WriteNoMsg();
         std::cout << msg << '\n';
-    }
-
-    ConsoleLogger::~ConsoleLogger()
-    {
-        Logger = nullptr;
     }
 }

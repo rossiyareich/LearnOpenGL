@@ -10,9 +10,9 @@
 
 namespace model
 {
-    Model::Model(const char* filePath) : meshes(), parentDirectory(), filePath(filePath)
+    Model::Model(const char* filePath) : meshes(), filePath(filePath)
     {
-        parentDirectory = this->filePath.substr(0, this->filePath.find_last_of('/'));
+        parentDirectory = this->filePath.substr(0, this->filePath.find_last_of('/')) + '/';
         LoadModel();
     }
 
@@ -25,16 +25,14 @@ namespace model
     void Model::LoadModel()
     {
         Assimp::Importer importer{};
-        const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate |
-                                                 aiProcess_FlipUVs |
-                                                 aiProcess_OptimizeMeshes);
+        const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
-            logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Error);
-            logging::ConsoleLogger::Logger->WriteLine(
+            logging::ConsoleLogger::Get().SetLogLevel(LogLevel::Error);
+            logging::ConsoleLogger::Get().WriteLine(
                 "Assimp error: LoadModel: " + std::string(importer.GetErrorString()));
-            logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Debug);
+            logging::ConsoleLogger::Get().SetLogLevel(LogLevel::Debug);
             assert(false);
         }
 
@@ -72,7 +70,7 @@ namespace model
                 texCoords.y = mesh->mTextureCoords[0][i].y;
             }
 
-            vertices.emplace_back(
+            Vertex vertex{
                 glm::vec3{
                     mesh->mVertices[i].x,
                     mesh->mVertices[i].y,
@@ -84,7 +82,8 @@ namespace model
                     mesh->mNormals[i].z
                 },
                 texCoords
-            );
+            };
+            vertices.push_back(vertex);
         }
 
         // Retrieve all indices
@@ -101,17 +100,17 @@ namespace model
         {
             aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-            const auto& diffuse = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+            auto diffuse{LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse")};
             textureData.insert(textureData.end(), diffuse.begin(), diffuse.end());
 
-            const auto& specular = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+            auto specular{LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular")};
             textureData.insert(textureData.end(), specular.begin(), specular.end());
 
-            const auto& emission = LoadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emission");
+            auto emission{LoadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emission")};
             textureData.insert(textureData.end(), emission.begin(), emission.end());
         }
 
-        return Mesh(vertices, indices, textureData);
+        return {vertices, indices, textureData};
     }
 
     std::vector<TextureData> Model::LoadMaterialTextures(aiMaterial* material,
@@ -123,13 +122,14 @@ namespace model
         for (size_t i = 0; i < material->GetTextureCount(type); i++)
         {
             aiString path{}; // File that contains the actual data
+            std::string pathStr{path.C_Str()};
             material->GetTexture(type, i, &path);
 
             bool isCached{};
             for (const auto& cached : textureCache)
             {
                 // Match
-                if (std::strcmp(cached.RelativePath.data(), path.C_Str()) == 0)
+                if (cached.RelativePath == pathStr)
                 {
                     textureData.push_back(cached);
                     isCached = true;
@@ -141,11 +141,20 @@ namespace model
             {
                 TextureData texture
                 {
-                    {
+                    rendering::Texture{
                         (parentDirectory + std::string(path.C_Str())).c_str(),
-                        GL_TEXTURE_2D
+                        GL_TEXTURE_2D,
+                        true,
+                        [](const GLenum target)
+                        {
+                            glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                            glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                        }
                     },
-                    typeName
+                    typeName,
+                    pathStr
                 };
 
                 textureData.push_back(texture);

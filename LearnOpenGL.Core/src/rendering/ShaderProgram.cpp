@@ -25,9 +25,9 @@ namespace rendering
         {
             glErrorLog infoLog;
             glGetProgramInfoLog(ProgramID, GL_ERROR_LENGTH, nullptr, infoLog);
-            logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Error);
-            logging::ConsoleLogger::Logger->WriteLine(infoLog);
-            logging::ConsoleLogger::Logger->SetLogLevel(LogLevel::Debug);
+            logging::ConsoleLogger::Get().SetLogLevel(LogLevel::Error);
+            logging::ConsoleLogger::Get().WriteLine(infoLog);
+            logging::ConsoleLogger::Get().SetLogLevel(LogLevel::Debug);
 
             assert(false);
         }

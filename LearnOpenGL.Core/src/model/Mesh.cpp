@@ -10,9 +10,9 @@ namespace model
         Vertices(vertices),
         Indices(indices),
         TextureData(textureData),
+        vao(),
         vbo(GL_ARRAY_BUFFER),
-        ebo(GL_ELEMENT_ARRAY_BUFFER),
-        vao()
+        ebo(GL_ELEMENT_ARRAY_BUFFER)
     {
         SetupMesh();
     }
@@ -20,11 +20,11 @@ namespace model
     void Mesh::SetupMesh()
     {
         vbo.Bind();
-        vbo.PushArray(Vertices, GL_STATIC_DRAW);
+        vbo.PushArray<const std::vector<model::Vertex>&>(Vertices, GL_STATIC_DRAW);
         vbo.Unbind();
 
         ebo.Bind();
-        ebo.PushArray(Indices, GL_STATIC_DRAW);
+        ebo.PushArray<const std::vector<uint32_t>&>(Indices, GL_STATIC_DRAW);
         ebo.Unbind();
 
         vao.Bind();
@@ -33,15 +33,15 @@ namespace model
         ebo.Bind();
 
         /* Set vbo vertex attributes */
+        glEnableVertexAttribArray(0); // Vertex positions @ location = 0
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                               reinterpret_cast<void*>(offsetof(Vertex, Position)));
-        glEnableVertexAttribArray(0); // Vertex positions @ location = 0
+        glEnableVertexAttribArray(1); // Vertex normals @ location = 1
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                               reinterpret_cast<void*>(offsetof(Vertex, Normal)));
-        glEnableVertexAttribArray(1); // Vertex normals @ location = 1
+        glEnableVertexAttribArray(2); // TexCoords @ location = 2
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                               reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
-        glEnableVertexAttribArray(2); // TexCoords @ location = 2
 
         vao.Unbind();
     }
@@ -51,12 +51,9 @@ namespace model
      */
     void Mesh::Draw(const rendering::ShaderProgram& program)
     {
-        vao.Bind();
-
         uint32_t diffuseNr{};
         uint32_t specularNr{};
         uint32_t emissionNr{};
-        diffuseNr = specularNr = emissionNr = 1;
 
         for (size_t i{}; i < TextureData.size(); i++)
         {
@@ -76,11 +73,14 @@ namespace model
                 totalTexturesPrefix = std::to_string(emissionNr++);
 
             program.SetUFInt((representationType + "[" + totalTexturesPrefix + "]").c_str(), i);
-            program.SetUFUint32("texturedMaterial.shininess", Shininess);
         }
-        rendering::Texture::Activate(GL_TEXTURE0);
-        glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, nullptr);
 
+        vao.Bind();
+        vbo.Bind();
+        ebo.Bind();
+
+        glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, nullptr);
         vao.Unbind();
+        rendering::Texture::Activate(GL_TEXTURE0);
     }
 }

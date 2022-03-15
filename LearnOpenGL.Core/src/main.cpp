@@ -97,7 +97,6 @@ void EmitAllLights(const ShaderProgram& program, const std::array<std::pair<Phon
 
 int main()
 {
-    std::unique_ptr<ILogger> logger{std::make_unique<ConsoleLogger>()};
     Window window{"LearnOpenGL", WINDOW_W, WINDOW_H};
 
     GLFWframebuffersizefun OnResized{
@@ -128,7 +127,7 @@ int main()
     {
         std::stringstream t_stringstream{};
         t_stringstream << "OpenGL Version: " << glGetString(GL_VERSION);
-        ConsoleLogger::Logger->WriteLine(t_stringstream.str());
+        ConsoleLogger::Get().WriteLine(t_stringstream.str());
     }
 
 #pragma region OpenGL_Tuning
@@ -308,7 +307,7 @@ int main()
         {"src/ext/meshVertexShader.vert", GL_VERTEX_SHADER},
         {"src/ext/meshFragmentShader.frag", GL_FRAGMENT_SHADER}
     };
-    Model backpackModel{"/res/backpack/backpack.obj"};
+    Model backpackModel{"res/backpack/backpack.obj"};
 
     bool isLightOn{true}, isLightKeyToggle{true};
     float deltaTime{}, lastFrame{};
@@ -323,7 +322,7 @@ int main()
         if (fpsSampleCount % FPS_SAMPLE_RATE == 0)
         {
             fpsSampleCount = 0;
-            ConsoleLogger::Logger->WriteLine("FPS: " + std::to_string((1 / deltaTime)));
+            ConsoleLogger::Get().WriteLine("FPS: " + std::to_string((1 / deltaTime)));
         }
         fpsSampleCount++;
 

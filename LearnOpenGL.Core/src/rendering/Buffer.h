@@ -26,15 +26,16 @@ namespace rendering
             glBufferData(BufferTarget, sizeof(arr), &arr, usage);
         }
 
-        template <const std::vector<model::Vertex>&>
-        void PushArray(const std::vector<model::Vertex>& vertices, GLenum usage)
+        template <>
+        void PushArray<const std::vector<model::Vertex>&>(const std::vector<model::Vertex>& vertices,
+                                                          GLenum usage) const
         {
             // Push vertices to buffer
             glBufferData(BufferTarget, vertices.size() * sizeof(model::Vertex), &vertices[0], usage);
         }
 
-        template <const std::vector<uint32_t>&>
-        void PushArray(const std::vector<uint32_t>& indices, GLenum usage)
+        template <>
+        void PushArray<const std::vector<uint32_t>&>(const std::vector<uint32_t>& indices, GLenum usage) const
         {
             // Push indices to buffer
             glBufferData(BufferTarget, indices.size() * sizeof(uint32_t), &indices[0], usage);
