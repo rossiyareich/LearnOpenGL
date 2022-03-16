@@ -10,20 +10,10 @@
 
 namespace model
 {
-    Model::Model(const char* filePath) : meshes(), filePath(filePath)
+    Model::Model(const char* filePath) : filePath(filePath)
     {
         parentDirectory = this->filePath.substr(0, this->filePath.find_last_of('/')) + '/';
-        LoadModel();
-    }
 
-    void Model::Draw(const rendering::ShaderProgram& program)
-    {
-        for (auto& mesh : meshes)
-            mesh.Draw(program);
-    }
-
-    void Model::LoadModel()
-    {
         Assimp::Importer importer{};
         const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -37,6 +27,12 @@ namespace model
         }
 
         ProcessNode(scene->mRootNode, scene);
+    }
+
+    void Model::Draw(const rendering::ShaderProgram& program) const
+    {
+        for (auto& mesh : meshes)
+            mesh.Draw(program);
     }
 
     void Model::ProcessNode(aiNode* node, const aiScene* scene)
@@ -122,8 +118,8 @@ namespace model
         for (size_t i = 0; i < material->GetTextureCount(type); i++)
         {
             aiString path{}; // File that contains the actual data
-            std::string pathStr{path.C_Str()};
             material->GetTexture(type, i, &path);
+            std::string pathStr = path.C_Str();
 
             bool isCached{};
             for (const auto& cached : textureCache)

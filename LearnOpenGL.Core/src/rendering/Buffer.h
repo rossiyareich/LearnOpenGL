@@ -31,14 +31,14 @@ namespace rendering
                                                           GLenum usage) const
         {
             // Push vertices to buffer
-            glBufferData(BufferTarget, vertices.size() * sizeof(model::Vertex), &vertices[0], usage);
+            glBufferData(BufferTarget, vertices.size() * sizeof(model::Vertex), vertices.data(), usage);
         }
 
         template <>
         void PushArray<const std::vector<uint32_t>&>(const std::vector<uint32_t>& indices, GLenum usage) const
         {
             // Push indices to buffer
-            glBufferData(BufferTarget, indices.size() * sizeof(uint32_t), &indices[0], usage);
+            glBufferData(BufferTarget, indices.size() * sizeof(uint32_t), indices.data(), usage);
         }
     };
 }

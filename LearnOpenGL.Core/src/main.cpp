@@ -467,7 +467,7 @@ int main()
             backpackProgram.Use();
 
             const RenderMatrix& backpackMatrixPipeline{
-                MatrixHelper::TransformationMatrix({10.0f, 0.0f, 0.0f}),
+                MatrixHelper::TransformationMatrix({0.0f, 2.0f, 0.0f}),
                 camera.GetView(),
                 MatrixHelper::PerspectiveMatrix(
                     Rotation::ToRadians(fov),
@@ -478,11 +478,10 @@ int main()
 
             backpackMatrixPipeline.SetMatrixPipeline(backpackProgram);
 
-            // Do lighting
+            backpackModel.Draw(backpackProgram);
+            backpackProgram.SetUFUint32("texturedMaterial.shininess", 32);
             EmitAllLights(backpackProgram, lightSources);
 
-            backpackProgram.SetUFUint32("texturedMaterial.shininess", 32);
-            backpackModel.Draw(backpackProgram);
             backpackProgram.Unuse();
         }
 

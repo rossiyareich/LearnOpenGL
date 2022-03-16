@@ -35,7 +35,7 @@ namespace model
         }
 
         rendering::Texture& Texture;
-        std::string RepresentationType; // Diffuse, Specular, etc.
-        std::string RelativePath;
+        std::string RepresentationType{}; // Diffuse, Specular, etc.
+        std::string RelativePath{};
     };
 }

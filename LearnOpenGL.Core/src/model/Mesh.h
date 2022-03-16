@@ -16,14 +16,13 @@ namespace model
         std::vector<Vertex> Vertices;
         std::vector<uint32_t> Indices;
         std::vector<TextureData> TextureData;
-        uint32_t Shininess;
-        Mesh(const std::vector<Vertex>& vertices,
-             const std::vector<uint32_t>& indices,
-             const std::vector<model::TextureData>& textureData);
-        void Draw(const rendering::ShaderProgram& program);
+        Mesh(std::vector<Vertex> vertices,
+             std::vector<uint32_t> indices,
+             std::vector<model::TextureData> textureData);
+        void Draw(const rendering::ShaderProgram& program) const;
     private:
-        rendering::VertexArray vao;
-        rendering::Buffer vbo, ebo;
-        void SetupMesh();
+        const rendering::VertexArray& vao{};
+        const rendering::Buffer& vbo{GL_ARRAY_BUFFER};
+        const rendering::Buffer& ebo{GL_ELEMENT_ARRAY_BUFFER};
     };
 }
