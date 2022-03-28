@@ -63,6 +63,12 @@
     <ClCompile Include="src\lighting\PhongLightData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\pModelLoading.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\chrono\Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\Shader.h">
@@ -123,6 +129,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\lighting\PhongLightData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\chrono\Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\Property.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

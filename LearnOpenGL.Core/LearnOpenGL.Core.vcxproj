@@ -177,14 +177,18 @@
     <ClCompile Include="src\manipulation\RenderMatrix.cpp" />
     <ClCompile Include="src\manipulation\Rotation.cpp" />
     <ClCompile Include="src\manipulation\MatrixHelper.cpp" />
+    <ClCompile Include="src\pModelLoading.h" />
     <ClCompile Include="src\rendering\Shader.cpp" />
     <ClCompile Include="src\rendering\ShaderProgram.cpp" />
     <ClCompile Include="src\rendering\Texture.cpp" />
     <ClCompile Include="src\rendering\Buffer.cpp" />
     <ClCompile Include="src\rendering\VertexArray.cpp" />
     <ClCompile Include="src\window\Window.cpp" />
+    <ClCompile Include="src\chrono\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\helpers\Property.h" />
+    <ClInclude Include="src\IMain.h" />
     <ClInclude Include="src\lighting\PhongLightData.h" />
     <ClInclude Include="src\lighting\PhongLightType.h" />
     <ClInclude Include="src\lighting\PhongMaterial.h" />
@@ -205,6 +209,7 @@
     <ClInclude Include="src\rendering\Buffer.h" />
     <ClInclude Include="src\rendering\VertexArray.h" />
     <ClInclude Include="src\window\Window.h" />
+    <ClInclude Include="src\chrono\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\ext\fragmentShader.frag">

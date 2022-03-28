@@ -59,7 +59,7 @@ inline std::tuple<float, float, float> HTMLToRGBFloat(const uint32_t htmlColor)
   \param fV Hue component, used as input, range: [0, 1]
 
 */
-void HSVtoRGB(float& fR, float& fG, float& fB, float fH, float fS, float fV)
+inline void HSVtoRGB(float& fR, float& fG, float& fB, float fH, float fS, float fV)
 {
     float fC = fV * fS; // Chroma
     float fHPrime = fmod(fH / 60.0, 6);
