@@ -137,7 +137,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)deps</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew\glew32s.lib;opengl32.lib;GLFW\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp\assimp-vc143-mt.lib;glew\glew32s.lib;opengl32.lib;GLFW\glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /d "$(ProjectDir)src\ext\" "$(OutDir)src\ext\" &amp; xcopy /y /d "$(ProjectDir)res\" "$(OutDir)res\"</Command>
@@ -177,6 +177,7 @@
     <ClCompile Include="src\manipulation\RenderMatrix.cpp" />
     <ClCompile Include="src\manipulation\Rotation.cpp" />
     <ClCompile Include="src\manipulation\MatrixHelper.cpp" />
+    <ClCompile Include="src\model\ModelMesh.cpp" />
     <ClCompile Include="src\pModelLoading.h" />
     <ClCompile Include="src\rendering\Shader.cpp" />
     <ClCompile Include="src\rendering\ShaderProgram.cpp" />
@@ -203,6 +204,10 @@
     <ClInclude Include="src\manipulation\RenderMatrix.h" />
     <ClInclude Include="src\manipulation\Rotation.h" />
     <ClInclude Include="src\manipulation\MatrixHelper.h" />
+    <ClInclude Include="src\model\ModelMesh.h" />
+    <ClInclude Include="src\model\ModelTexture.h" />
+    <ClInclude Include="src\model\ModelTextureType.h" />
+    <ClInclude Include="src\model\ModelVertex.h" />
     <ClInclude Include="src\rendering\Shader.h" />
     <ClInclude Include="src\rendering\ShaderProgram.h" />
     <ClInclude Include="src\rendering\Texture.h" />
