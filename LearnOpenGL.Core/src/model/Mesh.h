@@ -21,8 +21,8 @@ namespace model
              std::vector<model::TextureData> textureData);
         void Draw(const rendering::ShaderProgram& program) const;
     private:
-        const rendering::VertexArray& vao{};
-        const rendering::Buffer& vbo{GL_ARRAY_BUFFER};
-        const rendering::Buffer& ebo{GL_ELEMENT_ARRAY_BUFFER};
+        GLuint vao{};
+        GLuint vbo{};
+        GLuint ebo{};
     };
 }

@@ -143,165 +143,165 @@ int main()
 
 #pragma endregion
 
-    constexpr float vertices[]{
-        // positions          // normals           // texture coords
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+    //constexpr float vertices[]{
+    //    // positions          // normals           // texture coords
+    //    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+    //    0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
+    //    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+    //    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+    //    -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+    //    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    //    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    //    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+    //    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+    //    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+    //    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+    //    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    //    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    //    -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+    //    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    //    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    //    -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+    //    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    //    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    //    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+    //    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    //    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    //    0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+    //    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+    //    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+    //    0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+    //    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    //    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    //    -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+    //    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
 
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
-    };
+    //    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+    //    0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+    //    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    //    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    //    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+    //    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+    //};
 
-    // Create buffers
-    const Buffer& vboBuffer{GL_ARRAY_BUFFER}; // Share cube buffer between 2 shaders
-    vboBuffer.Bind();
-    vboBuffer.PushArray(vertices, GL_STATIC_DRAW);
-    vboBuffer.Unbind();
+    //// Create buffers
+    //const Buffer& vboBuffer{GL_ARRAY_BUFFER}; // Share cube buffer between 2 shaders
+    //vboBuffer.Bind();
+    //vboBuffer.PushArray(vertices, GL_STATIC_DRAW);
+    //vboBuffer.Unbind();
 
     Camera3D camera{{0.0f, 0.0f, 10.0f}};
     constexpr float moveSpeed{5.0f};
     constexpr float rollSpeed{1.0f};
 
-    const ShaderProgram& shaderProgram{
-        {"src/ext/vertexShader.vert", GL_VERTEX_SHADER},
-        {"src/ext/fragmentShader.frag", GL_FRAGMENT_SHADER}
-    };
-    // Gen & setup vertex array {
-    const VertexArray& vaoArray{};
-    vaoArray.Bind();
-    vboBuffer.Bind();
-    /* Set vbo vertex attributes */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 3));
-    glEnableVertexAttribArray(1); // Use vertex attributes @ location = 1
-    vaoArray.Unbind();
-    // } Unbind vertex array
-    glm::vec3 cubePositions[]{
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 4.0f, 0.0f)
-    };
-    glm::vec3 cubeColor{};
-    {
-        auto [r, g, b]{HTMLToRGBFloat(0xffffff)};
-        cubeColor = {r, g, b};
-    }
-    PhongMaterial cubeMaterial{cubeColor};
+    //const ShaderProgram& shaderProgram{
+    //    {"src/ext/vertexShader.vert", GL_VERTEX_SHADER},
+    //    {"src/ext/fragmentShader.frag", GL_FRAGMENT_SHADER}
+    //};
+    //// Gen & setup vertex array {
+    //const VertexArray& vaoArray{};
+    //vaoArray.Bind();
+    //vboBuffer.Bind();
+    ///* Set vbo vertex attributes */
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
+    //glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 3));
+    //glEnableVertexAttribArray(1); // Use vertex attributes @ location = 1
+    //vaoArray.Unbind();
+    //// } Unbind vertex array
+    //glm::vec3 cubePositions[]{
+    //    glm::vec3(0.0f, 0.0f, 0.0f),
+    //    glm::vec3(0.0f, 4.0f, 0.0f)
+    //};
+    //glm::vec3 cubeColor{};
+    //{
+    //    auto [r, g, b]{HTMLToRGBFloat(0xffffff)};
+    //    cubeColor = {r, g, b};
+    //}
+    //PhongMaterial cubeMaterial{cubeColor};
 
-    const ShaderProgram& lightSourceProgram{
-        {"src/ext/lightSourceVertexShader.vert", GL_VERTEX_SHADER},
-        {"src/ext/lightSourceFragmentShader.frag", GL_FRAGMENT_SHADER}
-    };
-    const VertexArray& lightSourceArray{};
-    lightSourceArray.Bind();
-    vboBuffer.Bind();
-    /* Set vbo vertex attributes */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
-    lightSourceArray.Unbind();
+    //const ShaderProgram& lightSourceProgram{
+    //    {"src/ext/lightSourceVertexShader.vert", GL_VERTEX_SHADER},
+    //    {"src/ext/lightSourceFragmentShader.frag", GL_FRAGMENT_SHADER}
+    //};
+    //const VertexArray& lightSourceArray{};
+    //lightSourceArray.Bind();
+    //vboBuffer.Bind();
+    ///* Set vbo vertex attributes */
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
+    //glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
+    //lightSourceArray.Unbind();
 
-    glm::vec3 lightColor{1.0f};
-    std::array lightSources =
-    {
-        std::pair{
-            PhongLightSource{
-                camera, {glm::vec3{1.0}}, glm::vec3{1.0f}, PhongLightType::GlobalDirectional, 0.1f, 0.0f, 0.0f
-            },
-            0
-        },
-        std::pair{PhongLightSource{camera, {{}, {0.7f, -5.0f, 2.0f}}, lightColor}, 0},
-        std::pair{PhongLightSource{camera, {{}, {2.3f, -3.3f, -4.0f}}, lightColor}, 1},
-        std::pair{PhongLightSource{camera, {{}, {-4.0f, 2.0f, -12.0f}}, lightColor}, 2},
-        std::pair{PhongLightSource{camera, {{}, {0.0f, 5.0f, 0.0f}}, lightColor}, 3},
-        std::pair{
-            PhongLightSource{camera, {{0.0f, 1.0f, 1.0f}}, glm::vec3{1.0f}, PhongLightType::GlobalDirectional}, 1
-        },
-        std::pair{
-            PhongLightSource{
-                camera,
-                {
-                    camera.GetFront(),
-                    camera.GetPosition(),
-                    Rotation::ToRadians(12.0f),
-                    Rotation::ToRadians(26.0f)
-                },
-                glm::vec3{0.5f, 0.5f, 0.2f},
-                PhongLightType::Spotlight,
-                0.0f,
-                4.0f,
-                2.0f
-            },
-            0
-        }
-    };
+    //glm::vec3 lightColor{1.0f};
+    //std::array lightSources =
+    //{
+    //    std::pair{
+    //        PhongLightSource{
+    //            camera, {glm::vec3{1.0}}, glm::vec3{1.0f}, PhongLightType::GlobalDirectional, 0.1f, 0.0f, 0.0f
+    //        },
+    //        0
+    //    },
+    //    std::pair{PhongLightSource{camera, {{}, {0.7f, -5.0f, 2.0f}}, lightColor}, 0},
+    //    std::pair{PhongLightSource{camera, {{}, {2.3f, -3.3f, -4.0f}}, lightColor}, 1},
+    //    std::pair{PhongLightSource{camera, {{}, {-4.0f, 2.0f, -12.0f}}, lightColor}, 2},
+    //    std::pair{PhongLightSource{camera, {{}, {0.0f, 5.0f, 0.0f}}, lightColor}, 3},
+    //    std::pair{
+    //        PhongLightSource{camera, {{0.0f, 1.0f, 1.0f}}, glm::vec3{1.0f}, PhongLightType::GlobalDirectional}, 1
+    //    },
+    //    std::pair{
+    //        PhongLightSource{
+    //            camera,
+    //            {
+    //                camera.GetFront(),
+    //                camera.GetPosition(),
+    //                Rotation::ToRadians(12.0f),
+    //                Rotation::ToRadians(26.0f)
+    //            },
+    //            glm::vec3{0.5f, 0.5f, 0.2f},
+    //            PhongLightType::Spotlight,
+    //            0.0f,
+    //            4.0f,
+    //            2.0f
+    //        },
+    //        0
+    //    }
+    //};
 
-    const ShaderProgram& texturedProgram{
-        {"src/ext/texturedVertexShader.vert", GL_VERTEX_SHADER},
-        {"src/ext/texturedFragmentShader.frag", GL_FRAGMENT_SHADER}
-    };
-    const VertexArray& texturedArray{};
-    texturedArray.Bind();
-    vboBuffer.Bind();
-    /* Set vbo vertex attributes */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 3));
-    glEnableVertexAttribArray(1); // Use vertex attributes @ location = 1
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 6));
-    glEnableVertexAttribArray(2); // Use vertex attributes @ location = 2
-    texturedArray.Unbind();
-    glm::vec3 texturedPositions[]{
-        glm::vec3(0.0f, 0.0f, -15.0f),
-        glm::vec3(2.0f, 5.0f, -14.0f),
-        glm::vec3(-1.5f, -2.2f, -13.0f),
-        glm::vec3(-3.8f, -2.0f, -12.0f),
-        glm::vec3(2.4f, -0.4f, -11.0f),
-        glm::vec3(-1.7f, 3.0f, -10.0f),
-        glm::vec3(1.3f, -2.0f, -9.0f),
-        glm::vec3(1.5f, 2.0f, -8.0f),
-        glm::vec3(1.5f, 0.2f, -7.0f),
-        glm::vec3(-1.3f, 1.0f, -6.0f)
-    };
-    PhongTexturedMaterial texturedMaterial{};
-    const Texture& diffuseMap{"res/container2.png", GL_TEXTURE_2D, true};
-    const Texture& specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
-    const Texture& emissionMap{"res/container2_emit.jpg", GL_TEXTURE_2D, true};
+    //const ShaderProgram& texturedProgram{
+    //    {"src/ext/texturedVertexShader.vert", GL_VERTEX_SHADER},
+    //    {"src/ext/texturedFragmentShader.frag", GL_FRAGMENT_SHADER}
+    //};
+    //const VertexArray& texturedArray{};
+    //texturedArray.Bind();
+    //vboBuffer.Bind();
+    ///* Set vbo vertex attributes */
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
+    //glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 3));
+    //glEnableVertexAttribArray(1); // Use vertex attributes @ location = 1
+    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 6));
+    //glEnableVertexAttribArray(2); // Use vertex attributes @ location = 2
+    //texturedArray.Unbind();
+    //glm::vec3 texturedPositions[]{
+    //    glm::vec3(0.0f, 0.0f, -15.0f),
+    //    glm::vec3(2.0f, 5.0f, -14.0f),
+    //    glm::vec3(-1.5f, -2.2f, -13.0f),
+    //    glm::vec3(-3.8f, -2.0f, -12.0f),
+    //    glm::vec3(2.4f, -0.4f, -11.0f),
+    //    glm::vec3(-1.7f, 3.0f, -10.0f),
+    //    glm::vec3(1.3f, -2.0f, -9.0f),
+    //    glm::vec3(1.5f, 2.0f, -8.0f),
+    //    glm::vec3(1.5f, 0.2f, -7.0f),
+    //    glm::vec3(-1.3f, 1.0f, -6.0f)
+    //};
+    //PhongTexturedMaterial texturedMaterial{};
+    //const Texture& diffuseMap{"res/container2.png", GL_TEXTURE_2D, true};
+    //const Texture& specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
+    //const Texture& emissionMap{"res/container2_emit.jpg", GL_TEXTURE_2D, true};
 
     const ShaderProgram& backpackProgram{
         {"src/ext/meshVertexShader.vert", GL_VERTEX_SHADER},
@@ -351,18 +351,18 @@ int main()
             camera.MovePositionEuler(0, 0, dt(moveSpeed));
         _OnKeyPressed(window, GLFW_KEY_F)
             camera.MovePositionEuler(0, 0, -dt(moveSpeed));
-        _OnKeyPressed(window, GLFW_KEY_L)
-        {
-            if (isLightKeyToggle)
-                isLightOn = !isLightOn;
-            auto& [source, index] = lightSources[6];
-            source.Ambient = 0.0f;
-            source.Diffuse = isLightOn ? 4.0f : 0.0f;
-            source.Specular = isLightOn ? 2.0f : 0.0f;
-            isLightKeyToggle = false;
-        }
-        _OnKeyReleased(window, GLFW_KEY_L)
-            isLightKeyToggle = true;
+        //_OnKeyPressed(window, GLFW_KEY_L)
+        //{
+        //    if (isLightKeyToggle)
+        //        isLightOn = !isLightOn;
+        //    auto& [source, index] = lightSources[6];
+        //    source.Ambient = 0.0f;
+        //    source.Diffuse = isLightOn ? 4.0f : 0.0f;
+        //    source.Specular = isLightOn ? 2.0f : 0.0f;
+        //    isLightKeyToggle = false;
+        //}
+        //_OnKeyReleased(window, GLFW_KEY_L)
+        //    isLightKeyToggle = true;
         camera.SetEulerAnglesRaw(Rotation::ToRadians(pitch), Rotation::ToRadians(yaw - 90.0f), camera.GetRollRad());
 
         {
@@ -371,103 +371,103 @@ int main()
         }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        {
-            // Start drawing box
-            shaderProgram.Use();
-            vaoArray.Bind();
-            for (auto& cubePosition : cubePositions)
-            {
-                const RenderMatrix& cubeMatrixPipeline{
-                    MatrixHelper::TransformationMatrix(cubePosition, {}, {5.0f, 1.0f, 5.0f}),
-                    camera.GetView(),
-                    MatrixHelper::PerspectiveMatrix(
-                        Rotation::ToRadians(fov),
-                        w / h,
-                        0.1f,
-                        100.0f)
-                };
-                cubeMatrixPipeline.SetMatrixPipeline(shaderProgram);
-                glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
-            }
-            // Do lighting
-            cubeMaterial.SendMaterial(shaderProgram);
-            EmitAllLights(shaderProgram, lightSources);
-            // Finish drawing box
-            shaderProgram.Unuse();
-            vaoArray.Unbind();
-        }
+        //{
+        //    // Start drawing box
+        //    shaderProgram.Use();
+        //    vaoArray.Bind();
+        //    for (auto& cubePosition : cubePositions)
+        //    {
+        //        const RenderMatrix& cubeMatrixPipeline{
+        //            MatrixHelper::TransformationMatrix(cubePosition, {}, {5.0f, 1.0f, 5.0f}),
+        //            camera.GetView(),
+        //            MatrixHelper::PerspectiveMatrix(
+        //                Rotation::ToRadians(fov),
+        //                w / h,
+        //                0.1f,
+        //                100.0f)
+        //        };
+        //        cubeMatrixPipeline.SetMatrixPipeline(shaderProgram);
+        //        glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+        //    }
+        //    // Do lighting
+        //    cubeMaterial.SendMaterial(shaderProgram);
+        //    EmitAllLights(shaderProgram, lightSources);
+        //    // Finish drawing box
+        //    shaderProgram.Unuse();
+        //    vaoArray.Unbind();
+        //}
 
-        {
-            texturedProgram.Use();
-            texturedArray.Bind();
-            Texture::Activate(GL_TEXTURE0);
-            diffuseMap.Bind();
-            Texture::Activate(GL_TEXTURE1);
-            specularMap.Bind();
-            Texture::Activate(GL_TEXTURE2);
-            emissionMap.Bind();
+        //{
+        //    texturedProgram.Use();
+        //    texturedArray.Bind();
+        //    Texture::Activate(GL_TEXTURE0);
+        //    diffuseMap.Bind();
+        //    Texture::Activate(GL_TEXTURE1);
+        //    specularMap.Bind();
+        //    Texture::Activate(GL_TEXTURE2);
+        //    emissionMap.Bind();
 
-            for (auto& texturedPosition : texturedPositions)
-            {
-                const RenderMatrix& texturedMatrixPipeline{
-                    MatrixHelper::TransformationMatrix(texturedPosition),
-                    camera.GetView(),
-                    MatrixHelper::PerspectiveMatrix(
-                        Rotation::ToRadians(fov),
-                        w / h,
-                        0.1f,
-                        100.0f)
-                };
-                texturedMatrixPipeline.SetMatrixPipeline(texturedProgram);
-                glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
-            }
+        //    for (auto& texturedPosition : texturedPositions)
+        //    {
+        //        const RenderMatrix& texturedMatrixPipeline{
+        //            MatrixHelper::TransformationMatrix(texturedPosition),
+        //            camera.GetView(),
+        //            MatrixHelper::PerspectiveMatrix(
+        //                Rotation::ToRadians(fov),
+        //                w / h,
+        //                0.1f,
+        //                100.0f)
+        //        };
+        //        texturedMatrixPipeline.SetMatrixPipeline(texturedProgram);
+        //        glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+        //    }
 
-            // Do lighting
-            texturedMaterial.SendMaterial(texturedProgram);
-            EmitAllLights(texturedProgram, lightSources);
-            texturedProgram.SetUFFloat("time", static_cast<float>(glfwGetTime()));
+        //    // Do lighting
+        //    texturedMaterial.SendMaterial(texturedProgram);
+        //    EmitAllLights(texturedProgram, lightSources);
+        //    texturedProgram.SetUFFloat("time", static_cast<float>(glfwGetTime()));
 
-            diffuseMap.Unbind();
-            specularMap.Unbind();
-            texturedProgram.Unuse();
-            texturedArray.Unbind();
-        }
+        //    diffuseMap.Unbind();
+        //    specularMap.Unbind();
+        //    texturedProgram.Unuse();
+        //    texturedArray.Unbind();
+        //}
 
-        {
-            // Start drawing light box
-            lightSourceProgram.Use();
-            lightSourceArray.Bind();
-            for (auto&& [source, index] : lightSources)
-            {
-                if (source.LightType == PhongLightType::Point)
-                {
-                    const RenderMatrix& lightMatrixPipeline{
-                        MatrixHelper::TransformationMatrix(
-                            source.LightData.LightPosition,
-                            Rotation({0.0f, 1.0f, 0.0f},
-                                     static_cast<float>(glfwGetTime()) * 10.0f),
-                            glm::vec3{0.3f}),
-                        camera.GetView(),
-                        MatrixHelper::PerspectiveMatrix(
-                            Rotation::ToRadians(fov),
-                            w / h,
-                            0.1f,
-                            100.0f)
-                    };
-                    lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
-                    glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
-                }
-            }
-            // Finish drawing light box
-            lightSourceProgram.Unuse();
-            lightSourceArray.Unbind();
-        }
+        //{
+        //    // Start drawing light box
+        //    lightSourceProgram.Use();
+        //    lightSourceArray.Bind();
+        //    for (auto&& [source, index] : lightSources)
+        //    {
+        //        if (source.LightType == PhongLightType::Point)
+        //        {
+        //            const RenderMatrix& lightMatrixPipeline{
+        //                MatrixHelper::TransformationMatrix(
+        //                    source.LightData.LightPosition,
+        //                    Rotation({0.0f, 1.0f, 0.0f},
+        //                             static_cast<float>(glfwGetTime()) * 10.0f),
+        //                    glm::vec3{0.3f}),
+        //                camera.GetView(),
+        //                MatrixHelper::PerspectiveMatrix(
+        //                    Rotation::ToRadians(fov),
+        //                    w / h,
+        //                    0.1f,
+        //                    100.0f)
+        //            };
+        //            lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
+        //            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
+        //        }
+        //    }
+        //    // Finish drawing light box
+        //    lightSourceProgram.Unuse();
+        //    lightSourceArray.Unbind();
+        //}
 
         {
             backpackProgram.Use();
 
             const RenderMatrix& backpackMatrixPipeline{
-                MatrixHelper::TransformationMatrix({0.0f, 2.0f, 0.0f}),
+                MatrixHelper::TransformationMatrix(),
                 camera.GetView(),
                 MatrixHelper::PerspectiveMatrix(
                     Rotation::ToRadians(fov),
@@ -479,8 +479,8 @@ int main()
             backpackMatrixPipeline.SetMatrixPipeline(backpackProgram);
 
             backpackModel.Draw(backpackProgram);
-            backpackProgram.SetUFUint32("texturedMaterial.shininess", 32);
-            EmitAllLights(backpackProgram, lightSources);
+            //backpackProgram.SetUFUint32("texturedMaterial.shininess", 32);
+            //EmitAllLights(backpackProgram, lightSources);
 
             backpackProgram.Unuse();
         }

@@ -11,18 +11,21 @@ namespace model
         Indices(std::move(indices)),
         TextureData(std::move(textureData))
     {
-        vbo.Bind();
-        vbo.PushArray<const std::vector<model::Vertex>&>(Vertices, GL_STATIC_DRAW);
-        vbo.Unbind();
+        glGenVertexArrays(1, &vao);
+        glGenBuffers(1, &vbo);
+        glGenBuffers(1, &ebo);
 
-        ebo.Bind();
-        ebo.PushArray<const std::vector<uint32_t>&>(Indices, GL_STATIC_DRAW);
-        ebo.Unbind();
+        glBindVertexArray(vao);
+        // load data into vertex buffers
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        // A great thing about structs is that their memory layout is sequential for all its items.
+        // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
+        // again translates to 3/2 floats which translates to a byte array.
+        glBufferData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(Vertex), &Vertices[0], GL_STATIC_DRAW);
 
-        vao.Bind();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(unsigned int), &Indices[0], GL_STATIC_DRAW);
 
-        vbo.Bind();
-        ebo.Bind();
 
         /* Set vbo vertex attributes */
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
@@ -35,7 +38,7 @@ namespace model
                               reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
         glEnableVertexAttribArray(2); // TexCoords @ location = 2
 
-        vao.Unbind();
+        glBindVertexArray(0);
     }
 
     /**
@@ -46,8 +49,6 @@ namespace model
         uint32_t diffuseNr{};
         uint32_t specularNr{};
         uint32_t emissionNr{};
-
-        vao.Bind();
 
         for (size_t i{}; i < TextureData.size(); i++)
         {
@@ -61,18 +62,16 @@ namespace model
 
             if (representationType == "texture_diffuse")
                 totalTexturesPrefix = std::to_string(diffuseNr++);
-            else if (representationType == "texture_specular")
-                totalTexturesPrefix = std::to_string(specularNr++);
-            else if (representationType == "texture_emission")
-                totalTexturesPrefix = std::to_string(emissionNr++);
 
-            program.SetUFInt((representationType + "[" + totalTexturesPrefix + "]").c_str(), i);
+            program.SetUFInt((representationType + totalTexturesPrefix).c_str(), i);
         }
 
-        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(Indices.size()), GL_UNSIGNED_INT, nullptr);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        rendering::Texture::Activate(GL_TEXTURE0);
+        glBindVertexArray(vao);
 
-        vao.Unbind();
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(Indices.size()), GL_UNSIGNED_INT, nullptr);
+
+        glBindVertexArray(0);
+
+        rendering::Texture::Activate(GL_TEXTURE0);
     }
 }

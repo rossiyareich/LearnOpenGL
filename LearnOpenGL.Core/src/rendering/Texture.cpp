@@ -19,7 +19,9 @@ namespace rendering
         Bind();
 
         GLenum format{};
-        if (colorChannels == 3)
+        if (colorChannels == 1)
+            format = GL_RED;
+        else if (colorChannels == 3)
             format = GL_RGB;
         else if (colorChannels == 4)
             format = GL_RGBA;
@@ -53,7 +55,9 @@ namespace rendering
         Bind();
 
         GLenum format{};
-        if (colorChannels == 3)
+        if (colorChannels == 1)
+            format = GL_RED;
+        else if (colorChannels == 3)
             format = GL_RGB;
         else if (colorChannels == 4)
             format = GL_RGBA;
