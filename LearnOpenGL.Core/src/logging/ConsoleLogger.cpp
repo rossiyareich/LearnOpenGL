@@ -1,5 +1,6 @@
 ﻿#include "ConsoleLogger.h"
 
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -14,14 +15,30 @@ namespace logging
     {
     }
 
-    ConsoleLogger::ConsoleLogger(const LogLevel& logLevel) : ILogger{}
+    ConsoleLogger& ConsoleLogger::Get()
     {
-        ConsoleLogger::SetLogLevel(logLevel);
+        static ConsoleLogger logger{};
+        return logger;
     }
+
 
     void ConsoleLogger::SetLogLevel(const LogLevel& logLevel)
     {
         this->logLevel = logLevel;
+    }
+
+    void ConsoleLogger::WriteLine(const char* msg, LogLevel logLevel)
+    {
+        SetLogLevel(logLevel);
+        WriteLine(msg);
+        SetLogLevel(LogLevel::Debug);
+    }
+
+    void ConsoleLogger::WriteLine(const std::string& msg, LogLevel logLevel)
+    {
+        SetLogLevel(logLevel);
+        WriteLine(msg);
+        SetLogLevel(LogLevel::Debug);
     }
 
     const LogLevel& ConsoleLogger::GetLogLevel() const
@@ -29,14 +46,14 @@ namespace logging
         return logLevel;
     }
 
-    void ConsoleLogger::WriteLine(const char* msg) const
+    void ConsoleLogger::WriteNoMsg() const
     {
         time_t now = std::time(nullptr);
         tm localTime{};
         localtime_s(&localTime, &now);
         std::ostringstream time_ss{};
         time_ss << std::put_time(&localTime, "%H:%M:%S");
-        const std::string& timeString{time_ss.str()};
+        const std::string& timeString{ time_ss.str() };
         switch (logLevel)
         {
         case LogLevel::Debug:
@@ -51,7 +68,18 @@ namespace logging
         default:
             throw std::exception("Not supported");
         }
+    }
 
+    void ConsoleLogger::WriteLine(const char* msg) const
+    {
+        WriteNoMsg();
+        std::cout << msg << '\n';
+    }
+
+    void ConsoleLogger::WriteLine(const std::string& msg) const
+    {
+        WriteNoMsg();
         std::cout << msg << '\n';
     }
 }
+

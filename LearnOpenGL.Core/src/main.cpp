@@ -1,6 +1,5 @@
 #include <complex>
 
-#include "IMain.h"
 #include "pModelLoading.h"
 
 int main()

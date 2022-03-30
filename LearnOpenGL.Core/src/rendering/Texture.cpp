@@ -7,6 +7,10 @@
 
 namespace rendering
 {
+    Texture::Texture()
+    {
+    }
+
     Texture::Texture(const char* const file, const GLenum target, const bool flipped) : TextureID{},
         TextureTarget{target}
     {

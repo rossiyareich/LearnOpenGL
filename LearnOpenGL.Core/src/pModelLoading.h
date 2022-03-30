@@ -32,12 +32,15 @@
 
 #include "rendering/Texture.h"
 
+#include "model/Model.h"
+
 using namespace rendering;
 using namespace window;
 using namespace manipulation;
 using namespace camera;
 using namespace lighting;
 using namespace logging;
+using namespace model;
 
 static float w = WINDOW_W;
 static float h = WINDOW_H;
@@ -102,7 +105,6 @@ public:
     int main() override
     {
         Window window{"LearnOpenGL", WINDOW_W, WINDOW_H};
-        std::unique_ptr<ILogger> logger{std::make_unique<ConsoleLogger>()};
 
         GLFWframebuffersizefun OnResized{
             [](GLFWwindow* window, int w, int h)
@@ -131,7 +133,7 @@ public:
 
         std::stringstream t_stringstream{};
         t_stringstream << "OpenGL Version: " << glGetString(GL_VERSION);
-        logger->WriteLine(t_stringstream.str().c_str());
+        ConsoleLogger::Get().WriteLine(t_stringstream.str().c_str());
 
 #pragma region OpenGL_Tuning
         //#define WIREFRAME
@@ -306,6 +308,12 @@ public:
         const Texture& specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
         const Texture& emissionMap{"res/container2_emit.jpg", GL_TEXTURE_2D, true};
 
+        ShaderProgram meshProgram{
+            {"src/ext/meshVertexShader.vert", GL_VERTEX_SHADER},
+            {"src/ext/meshFragmentShader.frag", GL_FRAGMENT_SHADER}
+        };
+        Model mesh{ "res/backpack/backpack.obj" };
+
         bool isLightOn{true}, isLightKeyToggle{true};
 
         chrono::Timer fpsUpdateTimer{};
@@ -324,7 +332,7 @@ public:
             if (fpsUpdateTimer.GetElapsed() > 1.0)
             {
                 fpsUpdateTimer.Start();
-                logger->WriteLine(("FPS: " + std::to_string((1 / deltaTime))).c_str());
+                ConsoleLogger::Get().WriteLine(("FPS: " + std::to_string((1 / deltaTime))).c_str());
             }
 
             OnKeyPressed(window, GLFW_KEY_ESCAPE)
@@ -434,6 +442,27 @@ public:
             }
 
             {
+                meshProgram.Use();
+
+                const RenderMatrix& meshMatrixPipeline{
+                    MatrixHelper::TransformationMatrix({0.0f, 2.0f, 0.0f}),
+                    camera.GetView(),
+                    MatrixHelper::PerspectiveMatrix(
+                        Rotation::ToRadians(fov),
+                        w / h,
+                        0.1f,
+                        100.0f)
+                };
+                meshMatrixPipeline.SetMatrixPipeline(meshProgram);
+                mesh.Draw(meshProgram);
+                meshProgram.SetUFUint32("texturedMaterial.shininess", MATERIAL_SHININESS);
+                texturedMaterial.SendMaterial(meshProgram);
+                EmitAllLights(meshProgram, lightSources);
+
+                meshProgram.Unuse();
+            }
+
+            {
                 // Start drawing light box
                 lightSourceProgram.Use();
                 lightSourceArray.Bind();
@@ -463,17 +492,17 @@ public:
                 lightSourceArray.Unbind();
             }
 
-            //for (auto& lightSource : lightSources)
-            //{
-            //    if (lightSource.LightType == PhongLightType::Point)
-            //    {
-            //        lightSource.LightData.LightPosition.x = cos(static_cast<float>(glfwGetTime())) * 1.2f;
-            //        lightSource.LightData.LightPosition.z = sin(static_cast<float>(glfwGetTime())) * 1.2f;
-            //    }
-            //}
-            //HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
-            //         0.3f,
-            //         1.0f);
+            for (auto& lightSource : lightSources)
+            {
+                if (lightSource.first.LightType == PhongLightType::Point)
+                {
+                    lightSource.first.LightData.LightPosition.x = cos(static_cast<float>(glfwGetTime())) * 1.2f;
+                    lightSource.first.LightData.LightPosition.z = sin(static_cast<float>(glfwGetTime())) * 1.2f;
+                }
+            }
+            HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
+                     0.3f,
+                     1.0f);
 
             glfwSwapBuffers(window.Handle); /* Swap front and back buffers */
             glfwPollEvents(); /* Poll for and process events */

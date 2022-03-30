@@ -10,6 +10,13 @@ namespace rendering
     public:
         uint32_t TextureID;
         GLenum TextureTarget;
+
+        Texture(const Texture& other) noexcept = default;
+        Texture& operator=(const Texture& other) noexcept = default;
+        Texture(Texture&& other) noexcept = default;
+        Texture& operator=(Texture&& other) noexcept = default;
+
+        Texture();
         Texture(const char* file, GLenum target, bool flipped = false);
         ~Texture();
         void Bind() const;

@@ -24,7 +24,6 @@ namespace model
         ModelMesh(const std::vector<ModelVertex>& vertices,
                   const std::vector<uint32_t>& indices,
                   const std::vector<ModelTexture>& textures);
-        void Draw(const rendering::ShaderProgram& shader);
-
+        void Draw(const rendering::ShaderProgram& shader) const;
     };
 }
