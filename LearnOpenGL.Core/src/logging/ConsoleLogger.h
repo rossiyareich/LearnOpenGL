@@ -10,9 +10,9 @@ namespace logging
     {
     public:
         static ConsoleLogger& Get();
-        ConsoleLogger(ConsoleLogger const&) = delete;
+        ConsoleLogger(const ConsoleLogger&) = delete;
         ConsoleLogger(ConsoleLogger&&) = delete;
-        ConsoleLogger& operator=(ConsoleLogger const&) = delete;
+        ConsoleLogger& operator=(const ConsoleLogger&) = delete;
         ConsoleLogger& operator=(ConsoleLogger&&) = delete;
 
         void WriteLine(const char* msg) const override;

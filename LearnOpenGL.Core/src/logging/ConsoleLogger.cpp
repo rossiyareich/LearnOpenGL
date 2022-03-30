@@ -53,7 +53,7 @@ namespace logging
         localtime_s(&localTime, &now);
         std::ostringstream time_ss{};
         time_ss << std::put_time(&localTime, "%H:%M:%S");
-        const std::string& timeString{ time_ss.str() };
+        const std::string& timeString{time_ss.str()};
         switch (logLevel)
         {
         case LogLevel::Debug:
@@ -82,4 +82,3 @@ namespace logging
         std::cout << msg << '\n';
     }
 }
-

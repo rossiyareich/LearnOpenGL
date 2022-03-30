@@ -11,11 +11,11 @@ namespace rendering
         glGenBuffers(1, &BufferID);
     }
 
-    Buffer::~Buffer()
-    {
-        Unbind();
-        glDeleteBuffers(1, &BufferID);
-    }
+    //Buffer::~Buffer()
+    //{
+    //    Unbind();
+    //    glDeleteBuffers(1, &BufferID);
+    //}
 
     void Buffer::Bind() const
     {

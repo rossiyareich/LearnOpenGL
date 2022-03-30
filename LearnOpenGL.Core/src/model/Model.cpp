@@ -96,11 +96,11 @@ namespace model
             aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
             LoadMaterialTextures(textures, material,
-                aiTextureType_DIFFUSE, ModelTextureType::texture_diffuse);
+                                 aiTextureType_DIFFUSE, ModelTextureType::texture_diffuse);
             LoadMaterialTextures(textures, material,
-                aiTextureType_SPECULAR, ModelTextureType::texture_specular);
+                                 aiTextureType_SPECULAR, ModelTextureType::texture_specular);
             LoadMaterialTextures(textures, material,
-                aiTextureType_EMISSIVE, ModelTextureType::texture_emission);
+                                 aiTextureType_EMISSIVE, ModelTextureType::texture_emission);
         }
 
         ModelMesh retMesh{vertices, indices, textures};
@@ -109,7 +109,7 @@ namespace model
     }
 
     void Model::LoadMaterialTextures(std::vector<ModelTexture>& textures, aiMaterial* mat, aiTextureType type,
-                                                          ModelTextureType textureType)
+                                     ModelTextureType textureType)
     {
         for (uint32_t i = 0; i < mat->GetTextureCount(type); i++)
         {

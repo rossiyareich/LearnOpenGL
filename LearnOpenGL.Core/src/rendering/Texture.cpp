@@ -44,10 +44,10 @@ namespace rendering
         Unbind();
     }
 
-    Texture::~Texture()
-    {
-        glDeleteTextures(1, &TextureID);
-    }
+    //Texture::~Texture()
+    //{
+    //    glDeleteTextures(1, &TextureID);
+    //}
 
     void Texture::Bind() const
     {

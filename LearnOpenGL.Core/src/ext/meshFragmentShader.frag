@@ -18,6 +18,7 @@ uniform vec3 cameraPosition;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 uniform sampler2D texture_emission1;
+uniform float time;
 struct TexturedMaterial
 {
     uint shininess;
@@ -40,8 +41,8 @@ struct Light {
     LightData lightData;
     vec3 lightColor;
     float ambient;
-    float texture_diffuse1;
-    float texture_specular1;
+    float diffuse;
+    float specular;
 };
 
 uniform Light globalDirLights[NR_GLOBALDIR_LIGHTS];
@@ -53,25 +54,30 @@ vec3 GetPhong(Light light, vec3 _lightDirection, float _attenuation, float _nonA
     // Ambient
     vec3 _ambient = light.ambient * texture(texture_diffuse1, ourTexCoords).rgb * light.lightColor;
 
-    // texture_diffuse1
+    // Diffuse
     vec3 _normal = normalize(ourNormal);
-    float _texture_diffuse1Coeff = max(dot(_normal, _lightDirection), 0.0);
-    vec3 _texture_diffuse1 = light.texture_diffuse1 * texture(texture_diffuse1, ourTexCoords).rgb  * (_texture_diffuse1Coeff * light.lightColor);
+    float _diffuseCoeff = max(dot(_normal, _lightDirection), 0.0);
+    vec3 _diffuse = light.diffuse * texture(texture_diffuse1, ourTexCoords).rgb  * (_diffuseCoeff * light.lightColor);
 
-    // texture_specular1
+    // Specular
     vec3 _viewDirection = normalize(cameraPosition - ourFragmentPosition);
     vec3 _reflectDirection = reflect(-_lightDirection, _normal);
-    float _texture_specular1Coeff = pow(max(dot(_viewDirection, _reflectDirection), 0.0), texturedMaterial.shininess);
-    vec3 _texture_specular1 = light.texture_specular1 * texture(texture_specular1, ourTexCoords).rgb  * (_texture_specular1Coeff * light.lightColor) ;
+    float _specularCoeff = pow(max(dot(_viewDirection, _reflectDirection), 0.0), texturedMaterial.shininess);
+    vec3 _specular = light.specular * texture(texture_specular1, ourTexCoords).rgb  * (_specularCoeff * light.lightColor) ;
 
-    // texture_emission1
-    vec3 _texture_emission1 = texture(texture_emission1, ourTexCoords).rgb;
+    // Emission
+    vec3 _emission = vec3(0.0);
+    if(texture(texture_specular1, ourTexCoords).rgb == vec3(0.0))
+    {
+        _emission = texture(texture_emission1, ourTexCoords + vec2(0.0, time)).rgb;
+        _emission *= (sin(time) * 0.5 + 0.5) * 2.0;
+    }
 
     _ambient *= _attenuation;
-    _texture_diffuse1 *= _attenuation * _nonAmbientCoeff;
-    _texture_specular1 *= _attenuation * _nonAmbientCoeff;
+    _diffuse *= _attenuation * _nonAmbientCoeff;
+    _specular *= _attenuation * _nonAmbientCoeff;
 
-    return (_ambient + _texture_diffuse1 + _texture_specular1 + _texture_emission1);
+    return (_ambient + _diffuse + _specular + _emission);
 }
 
 vec3 CalcGlobalDirLight(Light light)

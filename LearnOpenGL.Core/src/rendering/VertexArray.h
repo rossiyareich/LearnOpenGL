@@ -9,7 +9,7 @@ namespace rendering
         uint32_t ArrayID;
 
         VertexArray();
-        ~VertexArray();
+        //~VertexArray();
         void Bind() const;
         void Unbind() const;
     };

@@ -266,7 +266,7 @@ public:
                         Rotation::ToRadians(20.0f),
                         Rotation::ToRadians(60.0f)
                     },
-                    glm::vec3{0.5f, 0.5f, 0.2f},
+                    glm::vec3{0.5f, 0.5f, 0.5f},
                     PhongLightType::Spotlight,
                     0.0f,
                     4.0f,
@@ -312,7 +312,11 @@ public:
             {"src/ext/meshVertexShader.vert", GL_VERTEX_SHADER},
             {"src/ext/meshFragmentShader.frag", GL_FRAGMENT_SHADER}
         };
-        Model mesh{ "res/backpack/backpack.obj" };
+        std::array models
+        {
+            std::make_pair<Model, glm::vec3>({"res/backpack/backpack.obj"}, {5.0f, 2.0f, 0.0f}),
+            std::make_pair<Model, glm::vec3>({"res/monkey/monkey.obj"}, {10.0f, 2.0f, 0.0f})
+        };
 
         bool isLightOn{true}, isLightKeyToggle{true};
 
@@ -444,21 +448,22 @@ public:
             {
                 meshProgram.Use();
 
-                const RenderMatrix& meshMatrixPipeline{
-                    MatrixHelper::TransformationMatrix({0.0f, 2.0f, 0.0f}),
-                    camera.GetView(),
-                    MatrixHelper::PerspectiveMatrix(
-                        Rotation::ToRadians(fov),
-                        w / h,
-                        0.1f,
-                        100.0f)
-                };
-                meshMatrixPipeline.SetMatrixPipeline(meshProgram);
-                mesh.Draw(meshProgram);
+                for (auto& model : models)
+                {
+                    const RenderMatrix& meshMatrixPipeline{
+                        MatrixHelper::TransformationMatrix(model.second),
+                        camera.GetView(),
+                        MatrixHelper::PerspectiveMatrix(
+                            Rotation::ToRadians(fov),
+                            w / h,
+                            0.1f,
+                            100.0f)
+                    };
+                    meshMatrixPipeline.SetMatrixPipeline(meshProgram);
+                    model.first.Draw(meshProgram);
+                }
                 meshProgram.SetUFUint32("texturedMaterial.shininess", MATERIAL_SHININESS);
-                texturedMaterial.SendMaterial(meshProgram);
                 EmitAllLights(meshProgram, lightSources);
-
                 meshProgram.Unuse();
             }
 

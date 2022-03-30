@@ -208,5 +208,7 @@
     <CopyFileToFolders Include="res\backpack\specular.jpg">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="res\monkey\monkey.mtl" />
+    <CopyFileToFolders Include="res\monkey\monkey.obj" />
   </ItemGroup>
 </Project>

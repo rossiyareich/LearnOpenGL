@@ -8,7 +8,9 @@ namespace model
     {
         ModelTextureType Type;
 
-        ModelTexture() : Texture() { }
+        ModelTexture() : Texture()
+        {
+        }
 
         ModelTexture(const ModelTexture& other) noexcept = default;
         ModelTexture& operator=(const ModelTexture& other) noexcept = default;

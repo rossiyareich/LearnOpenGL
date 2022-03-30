@@ -18,7 +18,7 @@ namespace rendering
 
         Texture();
         Texture(const char* file, GLenum target, bool flipped = false);
-        ~Texture();
+        //~Texture();
         void Bind() const;
         void Unbind() const;
         static void Activate(GLenum target);

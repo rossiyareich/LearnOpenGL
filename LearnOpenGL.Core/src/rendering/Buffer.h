@@ -14,7 +14,7 @@ namespace rendering
         GLenum BufferTarget;
 
         Buffer(GLenum target);
-        ~Buffer();
+        //~Buffer();
 
         void Bind() const;
         void Unbind() const;
@@ -29,13 +29,13 @@ namespace rendering
         void PushArray<const std::vector<model::ModelVertex>>(const std::vector<model::ModelVertex>& vertices,
                                                               GLenum usage) const
         {
-            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(model::ModelVertex), &vertices[0], usage);
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(model::ModelVertex), vertices.data(), usage);
         }
 
         template <>
         void PushArray<const std::vector<uint32_t>>(const std::vector<uint32_t>& indices, GLenum usage) const
         {
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), &indices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
         }
     };
 }
