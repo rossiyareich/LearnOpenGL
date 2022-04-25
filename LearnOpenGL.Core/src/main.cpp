@@ -1,8 +1,6 @@
-#include <array>
 #include <functional>
 #include <iostream>
 #include <ostream>
-#include <sstream>
 
 #include <glew/glew.h>
 #include <GLFW/glfw3.h>
@@ -10,33 +8,25 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "camera/Camera3D.h"
+
 #include "helpers/Constants.h"
 #include "helpers/Helpers.h"
+
 #include "manipulation/MatrixHelper.h"
 #include "manipulation/RenderMatrix.h"
+
 #include "rendering/Buffer.h"
 #include "rendering/Shader.h"
 #include "rendering/ShaderProgram.h"
-#include "rendering/VertexArray.h"
-#include "window/Window.h"
-#include "lighting/PhongLightSource.h"
-#include "lighting/PhongMaterial.h"
-#include "lighting/PhongTexturedMaterial.h"
-
-#include "logging/ConsoleLogger.h"
-#include "logging/LogLevel.h"
-
-#include "model/Model.h"
-
 #include "rendering/Texture.h"
+#include "rendering/VertexArray.h"
+
+#include "window/Window.h"
 
 using namespace rendering;
 using namespace window;
 using namespace manipulation;
 using namespace camera;
-using namespace lighting;
-using namespace logging;
-using namespace model;
 
 static float w = WINDOW_W;
 static float h = WINDOW_H;
@@ -47,31 +37,28 @@ static bool firstMouse{true};
 
 void OnCursorPositionChanged(GLFWwindow* window, double xpos, double ypos)
 {
-    OnKeyReleasedPtr(window, GLFW_KEY_LEFT_CONTROL)
+    if (firstMouse)
     {
-        if (firstMouse)
-        {
-            lastX = xpos;
-            lastY = ypos;
-            firstMouse = false;
-        }
-
-        double xoffset = xpos - lastX;
-        double yoffset = lastY - ypos; // reverse because y is reversed
         lastX = xpos;
         lastY = ypos;
-
-        xoffset *= MOUSE_SENSITIVITY;
-        yoffset *= MOUSE_SENSITIVITY;
-
-        yaw += static_cast<float>(xoffset);
-        pitch += static_cast<float>(yoffset);
-
-        if (pitch > 90.0f)
-            pitch = 90.0f;
-        if (pitch < -90.0f)
-            pitch = -90.0f;
+        firstMouse = false;
     }
+
+    double xoffset = xpos - lastX;
+    double yoffset = lastY - ypos; // reverse because y is reversed
+    lastX = xpos;
+    lastY = ypos;
+
+    xoffset *= MOUSE_SENSITIVITY;
+    yoffset *= MOUSE_SENSITIVITY;
+
+    yaw += static_cast<float>(xoffset);
+    pitch += static_cast<float>(yoffset);
+
+    if (pitch > 90.0f)
+        pitch = 90.0f;
+    if (pitch < -90.0f)
+        pitch = -90.0f;
 }
 
 static float fov{45.0f};
@@ -83,16 +70,6 @@ void OnScrollChanged(GLFWwindow* window, double xoffset, double yoffset)
         fov = 45.0f;
     if (fov < 1.0f)
         fov = 1.0f;
-}
-
-template <size_t TSize>
-void EmitAllLights(const ShaderProgram& program, const std::array<std::pair<PhongLightSource, int>, TSize>& lights)
-{
-    for (const auto& light : lights)
-    {
-        auto& [source, index] = light;
-        source.Emit(program, index);
-    }
 }
 
 int main()
@@ -124,11 +101,7 @@ int main()
 
     glfwSetScrollCallback(window.Handle, OnScrollChanged);
 
-    {
-        std::stringstream t_stringstream{};
-        t_stringstream << "OpenGL Version: " << glGetString(GL_VERSION);
-        ConsoleLogger::Get().WriteLine(t_stringstream.str());
-    }
+    std::cout << glGetString(GL_VERSION) << std::endl;
 
 #pragma region OpenGL_Tuning
     //#define WIREFRAME
@@ -143,188 +116,124 @@ int main()
 
 #pragma endregion
 
+    //// x, y, z /* */ r, g, b, a /* */ x, y
     //constexpr float vertices[]{
-    //    // positions          // normals           // texture coords
-    //    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-    //    0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-    //    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-    //    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-    //    -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
-    //    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-
-    //    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    //    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-    //    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-    //    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-    //    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-    //    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-
-    //    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-    //    -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-    //    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    //    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    //    -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-    //    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-
-    //    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-    //    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-    //    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    //    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    //    0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-    //    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-
-    //    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-    //    0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-    //    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-    //    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-    //    -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-    //    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-
-    //    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    //    0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-    //    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    //    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    //    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    //    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+    //    0.5f, 0.5f, 0.0f, /* */ 0.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 1.0f, // top right
+    //    0.5f, -0.5f, 0.0f, /* */ 1.0f, 1.0f, 0.0f, 1.0f, /* */ 1.0f, 0.0f, // bottom right
+    //    -0.5f, -0.5f, 0.0f, /* */ 0.0f, 0.0f, 1.0f, 1.0f, /* */ 0.0f, 0.0f, // bottom left
+    //    -0.5f, 0.5f, 0.0f, /* */ 1.0f, 0.0f, 0.0f, 1.0f /* */, 0.0f, 1.0f // top left 
     //};
 
-    //// Create buffers
-    //const Buffer& vboBuffer{GL_ARRAY_BUFFER}; // Share cube buffer between 2 shaders
-    //vboBuffer.Bind();
-    //vboBuffer.PushArray(vertices, GL_STATIC_DRAW);
-    //vboBuffer.Unbind();
+    //constexpr uint8_t indices[]{
+    //    // note that we start from 0!
+    //    0, 1, 3, // first triangle
+    //    1, 2, 3 // second triangle
+    //};
 
-    Camera3D camera{{0.0f, 0.0f, 10.0f}};
+    // x, y, z /* */ r, g, b, a /* */ x, y
+    constexpr float vertices[] = {
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    constexpr float texCoords[]{
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f
+    };
+
+    // Create shader program
+    Shader vertexShader{"src/ext/vertexShader.vert", GL_VERTEX_SHADER};
+    Shader fragmentShader{"src/ext/fragmentShader.frag", GL_FRAGMENT_SHADER};
+    const ShaderProgram& shaderProgram{vertexShader, fragmentShader};
+
+    // Create buffers
+    const Buffer& vboBuffer{GL_ARRAY_BUFFER};
+    //const Buffer& eboBuffer{GL_ELEMENT_ARRAY_BUFFER};
+
+    // Gen & setup vertex array {
+    const VertexArray& vaoArray{};
+    vaoArray.Bind();
+
+    vboBuffer.Bind();
+    vboBuffer.PushArray(vertices, GL_STATIC_DRAW);
+    //eboBuffer.Bind();
+    //eboBuffer.PushArray(indices, GL_STATIC_DRAW);
+
+    /* Set vbo vertex attributes */
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 3));
+    glEnableVertexAttribArray(1); // Use rgba attributes @ location = 1
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(sizeof(float) * 7));
+    glEnableVertexAttribArray(2); // Use texCoords attributes @ location = 2
+
+    vaoArray.Unbind();
+    // } Unbind vertex array
+
+    // Setup textures
+    const Texture& boxTexture{"res/container.jpg", GL_TEXTURE_2D, true};
+    const Texture& awesomeFaceTexture{"res/awesomeface.png", GL_TEXTURE_2D, true};
+    shaderProgram.Use();
+    shaderProgram.SetUFInt("texture1", 0);
+    shaderProgram.SetUFInt("texture2", 1);
+
+    glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f, 0.0f, -3.0f),
+        glm::vec3(2.0f, 2.0f, -5.0f)
+    };
+
+    Camera3D camera{{0.0f, 0.0f, 3.0f}};
     constexpr float moveSpeed{5.0f};
     constexpr float rollSpeed{1.0f};
-
-    //const ShaderProgram& shaderProgram{
-    //    {"src/ext/vertexShader.vert", GL_VERTEX_SHADER},
-    //    {"src/ext/fragmentShader.frag", GL_FRAGMENT_SHADER}
-    //};
-    //// Gen & setup vertex array {
-    //const VertexArray& vaoArray{};
-    //vaoArray.Bind();
-    //vboBuffer.Bind();
-    ///* Set vbo vertex attributes */
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
-    //glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 3));
-    //glEnableVertexAttribArray(1); // Use vertex attributes @ location = 1
-    //vaoArray.Unbind();
-    //// } Unbind vertex array
-    //glm::vec3 cubePositions[]{
-    //    glm::vec3(0.0f, 0.0f, 0.0f),
-    //    glm::vec3(0.0f, 4.0f, 0.0f)
-    //};
-    //glm::vec3 cubeColor{};
-    //{
-    //    auto [r, g, b]{HTMLToRGBFloat(0xffffff)};
-    //    cubeColor = {r, g, b};
-    //}
-    //PhongMaterial cubeMaterial{cubeColor};
-
-    //const ShaderProgram& lightSourceProgram{
-    //    {"src/ext/lightSourceVertexShader.vert", GL_VERTEX_SHADER},
-    //    {"src/ext/lightSourceFragmentShader.frag", GL_FRAGMENT_SHADER}
-    //};
-    //const VertexArray& lightSourceArray{};
-    //lightSourceArray.Bind();
-    //vboBuffer.Bind();
-    ///* Set vbo vertex attributes */
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
-    //glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
-    //lightSourceArray.Unbind();
-
-    //glm::vec3 lightColor{1.0f};
-    //std::array lightSources =
-    //{
-    //    std::pair{
-    //        PhongLightSource{
-    //            camera, {glm::vec3{1.0}}, glm::vec3{1.0f}, PhongLightType::GlobalDirectional, 0.1f, 0.0f, 0.0f
-    //        },
-    //        0
-    //    },
-    //    std::pair{PhongLightSource{camera, {{}, {0.7f, -5.0f, 2.0f}}, lightColor}, 0},
-    //    std::pair{PhongLightSource{camera, {{}, {2.3f, -3.3f, -4.0f}}, lightColor}, 1},
-    //    std::pair{PhongLightSource{camera, {{}, {-4.0f, 2.0f, -12.0f}}, lightColor}, 2},
-    //    std::pair{PhongLightSource{camera, {{}, {0.0f, 5.0f, 0.0f}}, lightColor}, 3},
-    //    std::pair{
-    //        PhongLightSource{camera, {{0.0f, 1.0f, 1.0f}}, glm::vec3{1.0f}, PhongLightType::GlobalDirectional}, 1
-    //    },
-    //    std::pair{
-    //        PhongLightSource{
-    //            camera,
-    //            {
-    //                camera.GetFront(),
-    //                camera.GetPosition(),
-    //                Rotation::ToRadians(12.0f),
-    //                Rotation::ToRadians(26.0f)
-    //            },
-    //            glm::vec3{0.5f, 0.5f, 0.2f},
-    //            PhongLightType::Spotlight,
-    //            0.0f,
-    //            4.0f,
-    //            2.0f
-    //        },
-    //        0
-    //    }
-    //};
-
-    //const ShaderProgram& texturedProgram{
-    //    {"src/ext/texturedVertexShader.vert", GL_VERTEX_SHADER},
-    //    {"src/ext/texturedFragmentShader.frag", GL_FRAGMENT_SHADER}
-    //};
-    //const VertexArray& texturedArray{};
-    //texturedArray.Bind();
-    //vboBuffer.Bind();
-    ///* Set vbo vertex attributes */
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(0));
-    //glEnableVertexAttribArray(0); // Use vertex attributes @ location = 0
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 3));
-    //glEnableVertexAttribArray(1); // Use vertex attributes @ location = 1
-    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(sizeof(float) * 6));
-    //glEnableVertexAttribArray(2); // Use vertex attributes @ location = 2
-    //texturedArray.Unbind();
-    //glm::vec3 texturedPositions[]{
-    //    glm::vec3(0.0f, 0.0f, -15.0f),
-    //    glm::vec3(2.0f, 5.0f, -14.0f),
-    //    glm::vec3(-1.5f, -2.2f, -13.0f),
-    //    glm::vec3(-3.8f, -2.0f, -12.0f),
-    //    glm::vec3(2.4f, -0.4f, -11.0f),
-    //    glm::vec3(-1.7f, 3.0f, -10.0f),
-    //    glm::vec3(1.3f, -2.0f, -9.0f),
-    //    glm::vec3(1.5f, 2.0f, -8.0f),
-    //    glm::vec3(1.5f, 0.2f, -7.0f),
-    //    glm::vec3(-1.3f, 1.0f, -6.0f)
-    //};
-    //PhongTexturedMaterial texturedMaterial{};
-    //const Texture& diffuseMap{"res/container2.png", GL_TEXTURE_2D, true};
-    //const Texture& specularMap{"res/container2_specular.png", GL_TEXTURE_2D, true};
-    //const Texture& emissionMap{"res/container2_emit.jpg", GL_TEXTURE_2D, true};
-
-    const ShaderProgram& backpackProgram{
-        {"src/ext/meshVertexShader.vert", GL_VERTEX_SHADER},
-        {"src/ext/meshFragmentShader.frag", GL_FRAGMENT_SHADER}
-    };
-    Model backpackModel{"res/backpack/backpack.obj"};
-
-    bool isLightOn{true}, isLightKeyToggle{true};
-    float deltaTime{}, lastFrame{};
-    int fpsSampleCount{1};
+    float deltaTime{};
+    float lastFrame{};
 #define dt(var) (deltaTime * (var))
     while (!window.WindowShouldClose())
     {
         const auto currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
-        if (fpsSampleCount % FPS_SAMPLE_RATE == 0)
-        {
-            fpsSampleCount = 0;
-            ConsoleLogger::Get().WriteLine("FPS: " + std::to_string((1 / deltaTime)));
-        }
-        fpsSampleCount++;
 
         OnKeyPressed(window, GLFW_KEY_ESCAPE)
             window.SetInputMode(GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -333,7 +242,7 @@ int main()
             fov = 45.0f;
             pitch = 0.0f;
             yaw = 0.0f;
-            camera = Camera3D{{0.0f, 0.0f, 10.0f}};
+            camera = Camera3D{{0.0f, 0.0f, 3.0f}};
         }
         _OnKeyPressed(window, GLFW_KEY_W)
             camera.MovePositionEuler(dt(moveSpeed), 0, 0);
@@ -344,158 +253,57 @@ int main()
         _OnKeyPressed(window, GLFW_KEY_D)
             camera.MovePositionEuler(0, dt(moveSpeed), 0);
         _OnKeyPressed(window, GLFW_KEY_E)
-            camera.RotateEulerAngles(0, 0, -dt(rollSpeed));
+            camera.RotateEulerAngles(0, 0,dt(rollSpeed));
         _OnKeyPressed(window, GLFW_KEY_Q)
-            camera.RotateEulerAngles(0, 0, dt(rollSpeed));
+            camera.RotateEulerAngles(0, 0, -dt(rollSpeed));
         _OnKeyPressed(window, GLFW_KEY_R)
             camera.MovePositionEuler(0, 0, dt(moveSpeed));
         _OnKeyPressed(window, GLFW_KEY_F)
             camera.MovePositionEuler(0, 0, -dt(moveSpeed));
-        //_OnKeyPressed(window, GLFW_KEY_L)
-        //{
-        //    if (isLightKeyToggle)
-        //        isLightOn = !isLightOn;
-        //    auto& [source, index] = lightSources[6];
-        //    source.Ambient = 0.0f;
-        //    source.Diffuse = isLightOn ? 4.0f : 0.0f;
-        //    source.Specular = isLightOn ? 2.0f : 0.0f;
-        //    isLightKeyToggle = false;
-        //}
-        //_OnKeyReleased(window, GLFW_KEY_L)
-        //    isLightKeyToggle = true;
+
         camera.SetEulerAnglesRaw(Rotation::ToRadians(pitch), Rotation::ToRadians(yaw - 90.0f), camera.GetRollRad());
 
-        {
-            auto [r, g, b]{HTMLToRGBFloat(0x000b24)};
-            glClearColor(r, g, b, 1.0f);
-        }
+        auto [r, g, b]{HTMLToRGBFloat(0x0f3b19)};
+        glClearColor(r, g, b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //{
-        //    // Start drawing box
-        //    shaderProgram.Use();
-        //    vaoArray.Bind();
-        //    for (auto& cubePosition : cubePositions)
-        //    {
-        //        const RenderMatrix& cubeMatrixPipeline{
-        //            MatrixHelper::TransformationMatrix(cubePosition, {}, {5.0f, 1.0f, 5.0f}),
-        //            camera.GetView(),
-        //            MatrixHelper::PerspectiveMatrix(
-        //                Rotation::ToRadians(fov),
-        //                w / h,
-        //                0.1f,
-        //                100.0f)
-        //        };
-        //        cubeMatrixPipeline.SetMatrixPipeline(shaderProgram);
-        //        glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
-        //    }
-        //    // Do lighting
-        //    cubeMaterial.SendMaterial(shaderProgram);
-        //    EmitAllLights(shaderProgram, lightSources);
-        //    // Finish drawing box
-        //    shaderProgram.Unuse();
-        //    vaoArray.Unbind();
-        //}
+        // Start drawing
+        shaderProgram.Use();
+        vaoArray.Bind();
 
-        //{
-        //    texturedProgram.Use();
-        //    texturedArray.Bind();
-        //    Texture::Activate(GL_TEXTURE0);
-        //    diffuseMap.Bind();
-        //    Texture::Activate(GL_TEXTURE1);
-        //    specularMap.Bind();
-        //    Texture::Activate(GL_TEXTURE2);
-        //    emissionMap.Bind();
+        Texture::Activate(GL_TEXTURE0);
+        boxTexture.Bind();
+        Texture::Activate(GL_TEXTURE1);
+        awesomeFaceTexture.Bind();
 
-        //    for (auto& texturedPosition : texturedPositions)
-        //    {
-        //        const RenderMatrix& texturedMatrixPipeline{
-        //            MatrixHelper::TransformationMatrix(texturedPosition),
-        //            camera.GetView(),
-        //            MatrixHelper::PerspectiveMatrix(
-        //                Rotation::ToRadians(fov),
-        //                w / h,
-        //                0.1f,
-        //                100.0f)
-        //        };
-        //        texturedMatrixPipeline.SetMatrixPipeline(texturedProgram);
-        //        glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
-        //    }
+        //glDrawElements(GL_TRIANGLES, carraysize(indices), GL_UNSIGNED_BYTE, nullptr);
 
-        //    // Do lighting
-        //    texturedMaterial.SendMaterial(texturedProgram);
-        //    EmitAllLights(texturedProgram, lightSources);
-        //    texturedProgram.SetUFFloat("time", static_cast<float>(glfwGetTime()));
-
-        //    diffuseMap.Unbind();
-        //    specularMap.Unbind();
-        //    texturedProgram.Unuse();
-        //    texturedArray.Unbind();
-        //}
-
-        //{
-        //    // Start drawing light box
-        //    lightSourceProgram.Use();
-        //    lightSourceArray.Bind();
-        //    for (auto&& [source, index] : lightSources)
-        //    {
-        //        if (source.LightType == PhongLightType::Point)
-        //        {
-        //            const RenderMatrix& lightMatrixPipeline{
-        //                MatrixHelper::TransformationMatrix(
-        //                    source.LightData.LightPosition,
-        //                    Rotation({0.0f, 1.0f, 0.0f},
-        //                             static_cast<float>(glfwGetTime()) * 10.0f),
-        //                    glm::vec3{0.3f}),
-        //                camera.GetView(),
-        //                MatrixHelper::PerspectiveMatrix(
-        //                    Rotation::ToRadians(fov),
-        //                    w / h,
-        //                    0.1f,
-        //                    100.0f)
-        //            };
-        //            lightMatrixPipeline.SetMatrixPipeline(lightSourceProgram);
-        //            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 8);
-        //        }
-        //    }
-        //    // Finish drawing light box
-        //    lightSourceProgram.Unuse();
-        //    lightSourceArray.Unbind();
-        //}
-
+        for (auto& cubePosition : cubePositions)
         {
-            backpackProgram.Use();
+            const RenderMatrix& matrixPipeline{
 
-            const RenderMatrix& backpackMatrixPipeline{
-                MatrixHelper::TransformationMatrix(),
+                MatrixHelper::TransformationMatrix(
+                    cubePosition,
+                    {{0.5f, 1.0f, 0.0f}, 0}),
+
                 camera.GetView(),
+
                 MatrixHelper::PerspectiveMatrix(
                     Rotation::ToRadians(fov),
                     w / h,
                     0.1f,
                     100.0f)
             };
-
-            backpackMatrixPipeline.SetMatrixPipeline(backpackProgram);
-
-            backpackModel.Draw(backpackProgram);
-            //backpackProgram.SetUFUint32("texturedMaterial.shininess", 32);
-            //EmitAllLights(backpackProgram, lightSources);
-
-            backpackProgram.Unuse();
+            matrixPipeline.SetMatrixPipeline(shaderProgram);
+            glDrawArrays(GL_TRIANGLES, 0, carraysize(vertices) / 9);
         }
 
-        //for (auto& lightSource : lightSources)
-        //{
-        //    if (lightSource.LightType == PhongLightType::Point)
-        //    {
-        //        lightSource.LightData.LightPosition.x = cos(static_cast<float>(glfwGetTime())) * 1.2f;
-        //        lightSource.LightData.LightPosition.z = sin(static_cast<float>(glfwGetTime())) * 1.2f;
-        //    }
-        //}
-        //HSVtoRGB(lightColor.x, lightColor.y, lightColor.z, fmod(static_cast<float>(glfwGetTime()) * 10.0f, 360.0f),
-        //         0.3f,
-        //         1.0f);
+        boxTexture.Unbind();
+        awesomeFaceTexture.Unbind();
+
+        // Finish drawing
+        shaderProgram.Unuse();
+        vaoArray.Unbind();
 
         glfwSwapBuffers(window.Handle); /* Swap front and back buffers */
         glfwPollEvents(); /* Poll for and process events */
