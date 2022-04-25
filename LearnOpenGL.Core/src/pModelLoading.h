@@ -315,7 +315,8 @@ public:
         std::array models
         {
             std::make_pair<Model, glm::vec3>({"res/backpack/backpack.obj"}, {5.0f, 2.0f, 0.0f}),
-            std::make_pair<Model, glm::vec3>({"res/monkey/monkey.obj"}, {10.0f, 2.0f, 0.0f})
+            std::make_pair<Model, glm::vec3>({"res/monkey/monkey.obj"}, {10.0f, 2.0f, 0.0f}),
+            std::make_pair<Model, glm::vec3>({"res/building_scene/building_scene.obj"}, {50.0f, 2.0f, 0.0f})
         };
 
         bool isLightOn{true}, isLightKeyToggle{true};

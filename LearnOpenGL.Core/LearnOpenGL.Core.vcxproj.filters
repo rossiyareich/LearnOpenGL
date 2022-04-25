@@ -213,5 +213,7 @@
     <CopyFileToFolders Include="res\monkey\paper_base.png">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="res\building_scene\building_scene.mtl" />
+    <CopyFileToFolders Include="res\building_scene\building_scene.obj" />
   </ItemGroup>
 </Project>
